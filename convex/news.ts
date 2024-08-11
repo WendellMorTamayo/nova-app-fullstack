@@ -59,6 +59,22 @@ export const getTrendingNews = query({
   },
 });
 
+export const getNewsByAuthorId = query({
+  args: {
+    authorId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const news = await ctx.db
+      .query("news")
+      .filter((q) => q.eq(q.field("authorId"), args.authorId))
+      .collect();
+
+    const totalListeners = news.reduce((sum, news) => sum + news.views, 0);
+
+    return { news, listeners: totalListeners };
+  },
+});
+
 export const getNewsById = query({
   args: { newsId: v.id("news") },
   handler: async (ctx, args) => {
@@ -98,6 +114,57 @@ export const getNewsByNewsType = query({
           q.neq(q.field("_id"), args.newsId)
         )
       );
+  },
+});
+
+export const getNewsBySearch = query({
+  args: {
+    search: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.search === "") {
+      return await ctx.db.query("news").order("desc").collect();
+    }
+
+    const authorSearch = await ctx.db
+      .query("news")
+      .withSearchIndex("search_author", (q) => q.search("author", args.search))
+      .take(10);
+
+    if (authorSearch.length > 0) {
+      return authorSearch;
+    }
+
+    const titleSearch = await ctx.db
+      .query("news")
+      .withSearchIndex("search_title", (q) =>
+        q.search("newsTitle", args.search)
+      )
+      .take(10);
+
+    if (titleSearch.length > 0) {
+      return titleSearch;
+    }
+
+    const descriptionSearch = await ctx.db
+      .query("news")
+      .withSearchIndex("search_body", (q) =>
+        q.search("newsDescription", args.search)
+      )
+      .take(10);
+
+    if (descriptionSearch.length > 0) {
+      return descriptionSearch;
+    } else if (titleSearch.length > 0) {
+      return titleSearch;
+    } else {
+      return await ctx.db
+        .query("news")
+        .withSearchIndex("search_body", (q) =>
+          q.search("newsDescription", args.search)
+        )
+        .take(10);
+    }
   },
 });
 

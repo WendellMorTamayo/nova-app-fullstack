@@ -11,7 +11,7 @@ export interface EmptyStateProps {
   buttonLink?: string;
 }
 
-export interface TopNewsersProps {
+export interface TopUsersProps {
   _id: Id<"users">;
   _creationTime: number;
   email: string;
@@ -25,7 +25,7 @@ export interface TopNewsersProps {
   totalNews: number;
 }
 
-export interface newsProps {
+export interface NewsProps {
   _id: Id<"news">;
   _creationTime: number;
   audioStorageId: Id<"_storage"> | null;
@@ -46,7 +46,7 @@ export interface newsProps {
 }
 
 export interface ProfileNewsProps {
-  newss: newsProps[];
+  news: NewsProps[];
   listeners: number;
 }
 
@@ -116,7 +116,7 @@ export interface newsCardProps {
 }
 
 export interface CarouselProps {
-  fansLikeDetail: TopNewsersProps[];
+  fansLikeDetail: TopUsersProps[];
 }
 
 export interface ProfileCardProps {

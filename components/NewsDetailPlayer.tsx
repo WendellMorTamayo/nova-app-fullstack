@@ -66,7 +66,7 @@ const NewsDetailPlayer = ({
           src={imageUrl}
           width={250}
           height={250}
-          alt="Podcast image"
+          alt="News image"
           className="aspect-square rounded-lg"
         />
         <div className="flex w-full flex-col gap-5 max-md:items-center md:gap-9">
@@ -80,13 +80,21 @@ const NewsDetailPlayer = ({
                 router.push(`/profile/${authorId}`);
               }}
             >
-              <h2 className="text-16 font-normal text-white-3">{voiceType}</h2>
+              <Image
+                src={authorImageUrl}
+                width={30}
+                height={30}
+                alt="Caster icon"
+                className="size-[30px] rounded-full object-cover"
+              />
+              <h2 className="text-16 font-normal text-white-3">{author}</h2>
+              {/* <h2 className="text-16 font-normal text-white-3">{voiceType}</h2> */}
             </figure>
           </article>
 
           <Button
             onClick={handlePlay}
-            className="text-16 w-full max-w-[250px] bg-orange-1 font-extrabold text-white-1"
+            className="text-16 w-full max-w-[250px] bg-purple-1 font-extrabold text-white-1"
           >
             <Image
               src="/circle-play 1.svg"

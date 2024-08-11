@@ -1,22 +1,47 @@
 export const sidebarLinks = [
   {
-    route: "/trending",
-    label: "Trending",
-    imgUrl: "/bar-chart-2 1.svg",
-  },
-  {
     route: "/discover",
     label: "Discover",
-    imgUrl: "/telescope 1.svg",
+    imgUrl: "/discover.svg",
+  },
+  {
+    route: "/trending",
+    label: "Trending",
+    imgUrl: "/trending.svg",
   },
   {
     route: "/category",
     label: "Category",
-    imgUrl: "/layout-grid 1.svg",
-  },
-  {
-    route: "/create-news",
-    label: "Create News",
-    imgUrl: "/telescope 1.svg",
+    imgUrl: "/category.svg",
   },
 ];
+
+export const authenticatedSidebarLinks = [
+  {
+    route: "/recent",
+    label: "Recent",
+    imgUrl: "/icons/recent.svg",
+  },
+  {
+    route: "/playlist",
+    label: "Playlist",
+    imgUrl: "/icons/playlist.svg",
+  },
+  {
+    route: "/likes",
+    label: "Likes",
+    imgUrl: "/icons/likes.svg",
+  },
+  {
+    route: "/downloads",
+    label: "Download",
+    imgUrl: "/icons/download.svg",
+  }
+];
+
+export const createNewsLink =
+{
+  route: "/create-news",
+  label: "Create News",
+  imgUrl: "/discover.svg",
+};

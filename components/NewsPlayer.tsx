@@ -12,7 +12,7 @@ import { formatTime } from "@/lib/formatTime";
 const NewsPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const { audio } = useAudio();
@@ -132,16 +132,23 @@ const NewsPlayer = () => {
         <div className="flex cursor-pointer gap-2 md:gap-6 ">
           <div className="flex items-center gap-1.5">
             <Image
-              src={"/step-forward 2.svg"}
+              src={"/icons/reverse.svg"}
               width={24}
               height={24}
               alt="rewind"
               onClick={rewind}
             />
+            {/* <Image
+              src={"/icons/reverse.svg"}
+              width={24}
+              height={24}
+              alt="rewind"
+              onClick={rewind}
+            /> */}
             <h2 className="text-12 font-bold text-white-4">-5</h2>
           </div>
           <Image
-            src={isPlaying ? "/circle-play 1.svg" : "/angle-left 2.svg"}
+            src={!isPlaying ? "/circle-play 1.svg" : "/angle-left 2.svg"}
             width={30}
             height={30}
             alt="play"
@@ -150,7 +157,7 @@ const NewsPlayer = () => {
           <div className="flex items-center gap-1.5">
             <h2 className="text-12 font-bold text-white-4">+5</h2>
             <Image
-              src={"/step-forward 1.svg"}
+              src={"/icons/forward.svg"}
               width={24}
               height={24}
               alt="forward"
@@ -164,7 +171,7 @@ const NewsPlayer = () => {
           </h2>
           <div className="flex w-full gap-2">
             <Image
-              src={isMuted ? "/icons/unmute.svg" : "/volume 1.svg"}
+              src={isMuted ? "/icons/unmute.svg" : "/icons/mute.svg"}
               width={24}
               height={24}
               alt="mute unmute"

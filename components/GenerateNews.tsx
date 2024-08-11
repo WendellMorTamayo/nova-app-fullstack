@@ -112,7 +112,7 @@ const GenerateNews = (props: GenerateNewsProps) => {
       <div className="mt-5 w-full max-w-[200px]">
         <Button
           type="submit"
-          className="text-16 bg-orange-1 py-4 font-bold text-white-1"
+          className="text-16 bg-purple-1 py-4 font-bold text-white-1"
           onClick={generateNews}
         >
           {isGenerating ? (

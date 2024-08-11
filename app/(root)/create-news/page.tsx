@@ -58,7 +58,7 @@ const CreateNews = () => {
   const [audioDuration, setAudioDuration] = useState(0);
 
   const [voiceType, setVoiceType] = useState<string | null>(null);
-  const [newsType, setNewsType] = useState<string | null>(null);
+  const [newsType, setNewsType] = useState<string>("");
   const [voicePrompt, setVoicePrompt] = useState("");
 
   const createNews = useMutation(api.news.createNews);
@@ -114,7 +114,7 @@ const CreateNews = () => {
     }
   }
   return (
-    <section className="mt-19 flex flex-col">
+    <section className="mt-10 flex flex-col">
       <h1 className="text-2xl font-bold text-white-1">Create News</h1>
       <Form {...form}>
         <form
@@ -207,8 +207,7 @@ const CreateNews = () => {
               voicePrompt={voicePrompt}
               setVoicePrompt={setVoicePrompt}
               setAudioDuration={setAudioDuration}
-              setNewsType={setNewsType}
-            />
+              setNewsType={setNewsType} newsType={""}            />
             <GenerateThumbnail
               setImage={setImageUrl}
               setImageStorageId={setImageStorageId}
@@ -219,7 +218,7 @@ const CreateNews = () => {
             <div className="mt-10 w-full">
               <Button
                 type="submit"
-                className="text-16 w-full bg-orange-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1"
+                className="text-16 w-full bg-purple-1 py-4 font-extrabold text-white-1 transition-all duration-500 hover:bg-black-1"
               >
                 {isSubmitting ? (
                   <>

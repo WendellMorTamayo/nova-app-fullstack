@@ -14,19 +14,20 @@ const EmptyState = ({
     <section className="flex-center size-full flex-col gap-3">
       <Image src="/emptyState.svg" alt="emptyState" width={240} height={240} />
       <div className="flex-center w-full max-w-[254px] flex-col gap-3">
-        <h1 className="text-16 text-center font-medium text-white-1">
+        <h1 className="text-18 text-center font-medium text-white-1">
           {title}
         </h1>
         {search && (
           <p className="text-16 text-cent font-medium text-white-2">
-            Try adjusting you're search to find what you're looking for
+            Try adjusting you&apos;re search to find what you&apos;re looking
+            for
           </p>
         )}
         {buttonLink && (
-          <Button className="bg-orange-1">
+          <Button className="bg-purple-1">
             <Link href={buttonLink} className="gap-1 flex">
               <Image
-                src="/telescope 1.svg"
+                src="/discover.svg"
                 width={20}
                 height={20}
                 alt="discover"

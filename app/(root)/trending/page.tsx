@@ -16,13 +16,14 @@ const Trending = () => {
         <h1 className="text-32 font-bold text-white-1">Trending News</h1>
         <div className="podcast_grid">
           {trendingNews?.map(
-            ({ _id, newsTitle, newsDescription, imageUrl }) => (
+            ({ _id, newsTitle, newsDescription, imageUrl, views }) => (
               <NewsCard
                 key={_id}
                 imgUrl={imageUrl!}
                 title={newsTitle}
                 description={newsDescription}
                 newsId={_id}
+                views={views}
               />
             )
           )}

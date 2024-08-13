@@ -59,6 +59,13 @@ export const getTrendingNews = query({
   },
 });
 
+export const getAllNews = query({
+  handler: async (ctx) => {
+    const news = await ctx.db.query("news").collect();
+    return news;
+  },
+});
+
 export const getNewsByAuthorId = query({
   args: {
     authorId: v.string(),
@@ -175,14 +182,25 @@ export const deleteNews = mutation({
     audioStorageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
-    const podcast = await ctx.db.get(args.newsId);
+    const news = await ctx.db.get(args.newsId);
 
-    if (!podcast) {
+    if (!news) {
       throw new ConvexError("Podcast not found");
     }
 
     await ctx.storage.delete(args.imageStorageId);
     await ctx.storage.delete(args.audioStorageId);
     return await ctx.db.delete(args.newsId);
+  },
+});
+export const updateViews = mutation({
+  args: {
+    newsId: v.id("news"),
+    views: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const { newsId, views } = args;
+    const updatedViews = views + 1;
+    await ctx.db.patch(newsId, { views: updatedViews });
   },
 });

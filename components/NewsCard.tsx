@@ -1,13 +1,23 @@
 "use client";
+import { api } from "@/convex/_generated/api";
 import { newsCardProps } from "@/types";
+import { useMutation } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import React from "react";
 
-const NewsCard = ({ imgUrl, title, description, newsId }: newsCardProps) => {
+const NewsCard = ({
+  imgUrl,
+  title,
+  description,
+  newsId,
+  views,
+}: newsCardProps) => {
   const router = useRouter();
+  const updateViews = useMutation(api.news.updateViews);
   const handleViews = () => {
+    updateViews({ newsId, views });
     router.push(`/news/${newsId}`, { scroll: true });
   };
   return (

@@ -32,15 +32,9 @@ export const authenticatedSidebarLinks = [
     label: "Likes",
     imgUrl: "/icons/likes.svg",
   },
-  {
-    route: "/downloads",
-    label: "Download",
-    imgUrl: "/icons/download.svg",
-  }
 ];
 
-export const createNewsLink =
-{
+export const createNewsLink = {
   route: "/create-news",
   label: "Create News",
   imgUrl: "/discover.svg",

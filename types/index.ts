@@ -113,6 +113,7 @@ export interface newsCardProps {
   title: string;
   description: string;
   newsId: Id<"news">;
+  views: number;
 }
 
 export interface CarouselProps {

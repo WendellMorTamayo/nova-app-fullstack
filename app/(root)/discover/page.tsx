@@ -31,13 +31,14 @@ const Discover = ({
           {newsData.length > 0 ? (
             <div className="podcast_grid">
               {newsData?.map(
-                ({ _id, newsTitle, newsDescription, imageUrl }) => (
+                ({ _id, newsTitle, newsDescription, imageUrl, views }) => (
                   <NewsCard
                     key={_id}
                     imgUrl={imageUrl!}
                     title={newsTitle}
                     description={newsDescription}
                     newsId={_id}
+                    views={views}
                   />
                 )
               )}

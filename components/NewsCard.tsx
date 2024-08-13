@@ -16,7 +16,9 @@ const NewsCard = ({
 }: newsCardProps) => {
   const router = useRouter();
   const updateViews = useMutation(api.news.updateViews);
+  const addToRecent = useMutation(api.news.addToRecents);
   const handleViews = () => {
+    addToRecent({ newsId });
     updateViews({ newsId, views });
     router.push(`/news/${newsId}`, { scroll: true });
   };

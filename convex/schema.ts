@@ -31,4 +31,19 @@ export default defineSchema({
     clerkId: v.string(),
     name: v.string(),
   }),
+
+  userPlaylist: defineTable({
+    user: v.id("users"),
+    news: v.id("news"),
+  }),
+
+  userRecents: defineTable({
+    user: v.id("users"),
+    news: v.id("news"),
+  }),
+
+  userLikes: defineTable({
+    user: v.id("users"),
+    news: v.id("news"),
+  }),
 });

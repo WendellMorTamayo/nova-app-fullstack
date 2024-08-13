@@ -89,6 +89,21 @@ export const getNewsById = query({
   },
 });
 
+export const getNewsByMultipleIds = query({
+  args: {
+    newsIds: v.array(v.id("news")),
+  },
+  handler: async (ctx, args) => {
+    const { newsIds } = args;
+    const news = await Promise.all(
+      newsIds.map(async (id) => {
+        return await ctx.db.get(id);
+      })
+    );
+    return news;
+  },
+});
+
 export const getNewsByVoiceType = query({
   args: {
     newsId: v.id("news"),
@@ -185,7 +200,7 @@ export const deleteNews = mutation({
     const news = await ctx.db.get(args.newsId);
 
     if (!news) {
-      throw new ConvexError("Podcast not found");
+      throw new ConvexError("News not found");
     }
 
     await ctx.storage.delete(args.imageStorageId);
@@ -202,5 +217,63 @@ export const updateViews = mutation({
     const { newsId, views } = args;
     const updatedViews = views + 1;
     await ctx.db.patch(newsId, { views: updatedViews });
+  },
+});
+
+export const addToRecents = mutation({
+  args: {
+    newsId: v.id("news"),
+  },
+  handler: async (ctx, args) => {
+    const { newsId } = args;
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    const news = await ctx.db
+      .query("userRecents")
+      .filter((q) => q.eq(q.field("user"), user[0]._id))
+      .filter((q) => q.eq(q.field("news"), newsId))
+      .collect();
+
+    if (news.length == 0) {
+      await ctx.db.insert("userRecents", { user: user[0]._id, news: newsId });
+    } else {
+      await ctx.db.patch(news[0]._id, { _creationTime: Date.now() });
+    }
+  },
+});
+
+export const getRecents = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    return await ctx.db
+      .query("userRecents")
+      .filter((q) => q.eq(q.field("user"), user[0]._id))
+      .collect();
   },
 });

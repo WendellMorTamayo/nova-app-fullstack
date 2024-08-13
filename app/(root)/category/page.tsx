@@ -18,7 +18,9 @@ const Category = () => {
     <div className="mt-4 flex flex-col gap-9">
       <section className="flex flex-col gap-5">
         {categorizedNews
-          .filter((news) => news?.news?.length > 0)
+          .filter(
+            (news) => news?.news?.length != undefined && news?.news?.length > 0
+          )
           .map(({ category, news }) => (
             <>
               <h1

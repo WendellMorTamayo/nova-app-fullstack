@@ -16,7 +16,7 @@ const Recent = () => {
     .map((r) => r.news);
 
   const recentNews = useQuery(api.news.getNewsByMultipleIds, {
-    newsIds: recentNewsIds,
+    newsIds: recentNewsIds!,
   });
 
   return (

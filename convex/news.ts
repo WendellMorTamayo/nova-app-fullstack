@@ -277,3 +277,68 @@ export const getRecents = query({
       .collect();
   },
 });
+
+export const createPlaylist = mutation({
+  args: { playlistName: v.string() },
+  handler: async (ctx, args) => {
+    const { playlistName } = args;
+
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    await ctx.db.insert("userPlaylist", {
+      user: user[0]._id,
+      playlistName: playlistName,
+    });
+  },
+});
+
+export const getUserPlaylists = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    const playlists = await ctx.db
+      .query("userPlaylist")
+      .filter((playlist) => playlist.eq(playlist.field("user"), user[0]._id))
+      .collect();
+
+    return playlists;
+  },
+});
+
+export const getPlaylistContents = query({
+  args: { playlistId: v.id("userPlaylist") },
+  handler: async (ctx, args) => {
+    const { playlistId } = args;
+
+    const news = await ctx.db
+      .query("playlistContent")
+      .filter((content) => content.eq(content.field("playlist"), playlistId))
+      .collect();
+
+    return news;
+  },
+});

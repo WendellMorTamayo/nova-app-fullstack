@@ -34,6 +34,11 @@ export default defineSchema({
 
   userPlaylist: defineTable({
     user: v.id("users"),
+    playlistName: v.string(),
+  }),
+
+  playlistContent: defineTable({
+    playlist: v.id("userPlaylist"),
     news: v.id("news"),
   }),
 

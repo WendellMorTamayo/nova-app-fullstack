@@ -1,4 +1,5 @@
 "use client";
+
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import Image from "next/image";
@@ -8,7 +9,6 @@ import NewsDetailPlayer from "@/components/NewsDetailPlayer";
 import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import EmptyState from "@/components/EmptyState";
-import RightSidebar from "@/components/RightSidebar";
 
 const NewsDetails = ({
   params: { newsId },

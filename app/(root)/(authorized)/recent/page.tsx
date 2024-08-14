@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyState from "@/components/EmptyState";
+import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import Searchbar from "@/components/SearchBar";
 import { api } from "@/convex/_generated/api";
@@ -11,17 +12,24 @@ import React from "react";
 
 const Recent = () => {
   const recents = useQuery(api.news.getRecents);
+  const { audio } = useAudio();
   const recentNewsIds = recents
-    ?.sort((a, b) => (a._creationTime < b._creationTime ? 1 : -1))
+    ?.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1))
     .map((r) => r.news);
 
   const recentNews = useQuery(api.news.getNewsByMultipleIds, {
     newsIds: recentNewsIds!,
   });
 
+  if (!recentNews) return <LoaderSpinner />;
+
   return (
-    <div className="mt-4 flex flex-col gap-9">
-      <section className="flex flex-col gap-5">
+    <section
+      className={cn("flex flex-col mt-4 gap-4 h-[100vh-70px]", {
+        "h-[calc(100vh-400px)]": audio?.audioUrl,
+      })}
+    >
+      <div className="flex flex-col gap-4">
         <h1 className="text-32 font-bold text-white-1">Recent</h1>
         {recentNews?.length != undefined && recentNews.length > 0 ? (
           <div className="podcast_grid">
@@ -39,14 +47,20 @@ const Recent = () => {
             )}
           </div>
         ) : (
-          <EmptyState
-            title="You have not watched any news yet"
-            buttonText="Discover"
-            buttonLink="/discover"
-          />
+          <div
+            className={cn("border border-dashed border-gray-400 h-[750px]", {
+              "h-[calc(100vh-300px)]": audio?.audioUrl,
+            })}
+          >
+            <EmptyState
+              title="You have not watched any news yet"
+              buttonText="Discover"
+              buttonLink="/discover"
+            />
+          </div>
         )}
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

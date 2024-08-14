@@ -45,6 +45,7 @@ export default defineSchema({
   userRecents: defineTable({
     user: v.id("users"),
     news: v.id("news"),
+    lastPlayed: v.number(),
   }),
 
   userLikes: defineTable({

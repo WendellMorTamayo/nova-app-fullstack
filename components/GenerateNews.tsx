@@ -96,7 +96,7 @@ const GenerateNews = (props: GenerateNewsProps) => {
   const { isGenerating, generateNews } = useGenerateNews(props);
 
   return (
-    <div>
+    <div> 
       <div className="flex flex-col gap-2.5">
         <Label className="text-16 font-bold text-white-1">
           AI Prompt to Generate Podcast

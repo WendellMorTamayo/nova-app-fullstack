@@ -73,7 +73,7 @@ const CreateNews = () => {
     },
   });
 
-  const voiceCategories = ["alloy", "shimmer", "nova", "echo", "fable", "onyx"];
+  const voiceCategories = ["Alloy", "Shimmer", "Nova", "Echo", "Fable", "Onyx"];
 
   // 2. Define a submit handler.
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -207,7 +207,9 @@ const CreateNews = () => {
               voicePrompt={voicePrompt}
               setVoicePrompt={setVoicePrompt}
               setAudioDuration={setAudioDuration}
-              setNewsType={setNewsType} newsType={""}            />
+              setNewsType={setNewsType}
+              newsType={""}
+            />
             <GenerateThumbnail
               setImage={setImageUrl}
               setImageStorageId={setImageStorageId}

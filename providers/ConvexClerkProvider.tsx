@@ -16,13 +16,17 @@ const ConvexClerkProvider = ({ children }: { children: ReactNode }) => (
       layout: {
         socialButtonsVariant: "iconButton",
         logoImageUrl: "/logo.png",
+        unsafe_disableDevelopmentModeWarnings: true,
       },
       variables: {
         colorBackground: "#15171c",
-        colorPrimary: "",
-        colorText: "white",
+        colorPrimary: "#5C67DE",
+        colorText: "#ffffff",
         colorInputBackground: "#1b1f29",
-        colorInputText: "white",
+        colorInputText: "#ffffff",
+        colorTextSecondary: "#ffffff",
+        colorTextOnPrimaryBackground: "#ffffff",
+        colorNeutral: "#ffffff",
       },
     }}
   >

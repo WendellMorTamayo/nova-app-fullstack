@@ -248,9 +248,9 @@ export const addToRecents = mutation({
       .collect();
 
     if (news.length == 0) {
-      await ctx.db.insert("userRecents", { user: user[0]._id, news: newsId });
+      await ctx.db.insert("userRecents", { user: user[0]._id, news: newsId, lastPlayed: Date.now() });
     } else {
-      await ctx.db.patch(news[0]._id, { _creationTime: Date.now() });
+      await ctx.db.patch(news[0]._id, { lastPlayed: Date.now() });
     }
   },
 });

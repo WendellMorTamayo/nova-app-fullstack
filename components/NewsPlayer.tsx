@@ -8,14 +8,19 @@ import { useAudio } from "@/providers/AudioProvider";
 
 import { Progress } from "./ui/progress";
 import { formatTime } from "@/lib/formatTime";
+import { AddToLikesButton } from "./LikeButton";
+import { useUser } from "@clerk/nextjs";
 
 const NewsPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(100);
+  const { user } = useUser();
+  const [duration, setDuration] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const { audio } = useAudio();
+
+  const isOwner = user?.id === audio?.author;
 
   const togglePlayPause = () => {
     if (audioRef.current?.paused) {
@@ -138,13 +143,6 @@ const NewsPlayer = () => {
               alt="rewind"
               onClick={rewind}
             />
-            {/* <Image
-              src={"/icons/reverse.svg"}
-              width={24}
-              height={24}
-              alt="rewind"
-              onClick={rewind}
-            /> */}
             <h2 className="text-12 font-bold text-white-4">-5</h2>
           </div>
           <Image
@@ -169,6 +167,7 @@ const NewsPlayer = () => {
           <h2 className="text-16 font-normal text-white-2 max-md:hidden">
             {formatTime(duration)}
           </h2>
+          {!isOwner ? <AddToLikesButton /> : null}
           <div className="flex w-full gap-2">
             <Image
               src={isMuted ? "/icons/unmute.svg" : "/icons/mute.svg"}

@@ -38,7 +38,7 @@ const RightSidebar = () => {
         <Carousel fansLikeDetail={topUsers!} />
       </section>
       <section className="flex flex-col gap-8 pt-12">
-        <Header headerTitle="Top Podcastrs" />
+        <Header headerTitle="Top Nova Users" />
         <div className="flex flex-col gap-6">
           {topUsers?.slice(0, 3).map((user) => (
             <div

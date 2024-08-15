@@ -12,6 +12,7 @@ import { useQuery } from "convex/react";
 import React from "react";
 
 const Recent = () => {
+  const { audio } = useAudio();
   const recents = useQuery(api.news.getRecents);
   const recentNewsIds = recents
     ?.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1))
@@ -24,8 +25,12 @@ const Recent = () => {
   if (!recentNews) return <LoaderSpinner />;
 
   return (
-    <div className="mt-4 flex flex-col gap-9">
-      <section className="flex flex-col gap-5">
+    <section
+      className={cn("flex flex-col mt-4 gap-4 h-[100vh-70px]", {
+        "h-[calc(100vh-400px)]": audio?.audioUrl,
+      })}
+    >
+      <div className="flex flex-col gap-4">
         <h1 className="text-32 font-bold text-white-1">Recent</h1>
         {recentNews?.length != undefined && recentNews.length > 0 ? (
           <div className="podcast_grid">
@@ -43,7 +48,11 @@ const Recent = () => {
             )}
           </div>
         ) : (
-          <div className="border border-dashed border-gray-400 h-[750px] h-[calc(100vh-300px)]">
+          <div
+            className={cn("border border-dashed border-gray-400 h-[750px]", {
+              "h-[calc(100vh-300px)]": audio?.audioUrl,
+            })}
+          >
             <EmptyState
               title="You have not watched any news yet"
               buttonText="Discover"
@@ -51,8 +60,8 @@ const Recent = () => {
             />
           </div>
         )}
-      </section>
-    </div>
+      </div>
+    </section>
   );
 };
 

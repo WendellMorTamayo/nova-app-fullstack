@@ -31,7 +31,12 @@ export default defineSchema({
     clerkId: v.string(),
     name: v.string(),
     accountType: v.optional(v.string()),
-  }),
+    subscriptionId: v.optional(v.string()),
+    endsOn: v.optional(v.number()),
+    credits: v.optional(v.number()),
+  })
+    .index("by_userId", ["clerkId"])
+    .index("by_subscriptionId", ["subscriptionId"]),
 
   userRecents: defineTable({
     user: v.id("users"),
@@ -42,5 +47,14 @@ export default defineSchema({
   userLikes: defineTable({
     user: v.id("users"),
     news: v.id("news"),
+  }),
+
+  payments: defineTable({
+    text: v.string(),
+    stripeId: v.optional(v.string()),
+    messageId: v.optional(v.id("messages")),
+  }).index("stripeId", ["stripeId"]),
+  messages: defineTable({
+    text: v.string(),
   }),
 });

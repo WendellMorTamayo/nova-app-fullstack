@@ -18,8 +18,10 @@ import type * as ai from "../ai.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as news from "../news.js";
+import type * as stripe from "../stripe.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
+import type * as util from "../util.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -34,8 +36,10 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   http: typeof http;
   news: typeof news;
+  stripe: typeof stripe;
   tasks: typeof tasks;
   users: typeof users;
+  util: typeof util;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

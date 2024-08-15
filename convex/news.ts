@@ -328,7 +328,7 @@ export const removeFromLikes = mutation({
 });
 
 export const getLikesByNewsId = query({
-  args: { newsId: v.id("news") },
+  args: { newsId: v.optional(v.id("news")) },
   handler: async (ctx, args) => {
     const { newsId } = args;
     const identity = await ctx.auth.getUserIdentity();

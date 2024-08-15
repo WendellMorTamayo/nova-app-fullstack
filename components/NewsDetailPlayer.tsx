@@ -79,17 +79,7 @@ const NewsDetailPlayer = ({
               onClick={() => {
                 router.push(`/profile/${authorId}`);
               }}
-            >
-              <Image
-                src={authorImageUrl}
-                width={30}
-                height={30}
-                alt="Caster icon"
-                className="size-[30px] rounded-full object-cover"
-              />
-              <h2 className="text-16 font-normal text-white-3">{author}</h2>
-              {/* <h2 className="text-16 font-normal text-white-3">{voiceType}</h2> */}
-            </figure>
+            ></figure>
           </article>
 
           <Button

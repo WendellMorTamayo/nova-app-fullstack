@@ -37,36 +37,6 @@ const RightSidebar = () => {
         <Header headerTitle="Fans like you" />
         <Carousel fansLikeDetail={topUsers!} />
       </section>
-      <section className="flex flex-col gap-8 pt-12">
-        <Header headerTitle="Top Nova Users" />
-        <div className="flex flex-col gap-6">
-          {topUsers?.slice(0, 3).map((user) => (
-            <div
-              key={user._id}
-              className="flex cursor-pointer justify-between"
-              onClick={() => router.push(`/profile/${user.clerkId}`)}
-            >
-              <figure className="flex items-center gap-2">
-                <Image
-                  src={user.imageUrl}
-                  alt={user.name}
-                  width={44}
-                  height={44}
-                  className="aspect-square rounded-lg"
-                />
-                <h2 className="text-14 font-semibold text-white-1">
-                  {user.name}
-                </h2>
-              </figure>
-              <div className="flex items-center">
-                <p className="text-12 font-normal text-white-1">
-                  {user.totalNews} news
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </section>
   );
 };

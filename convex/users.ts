@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 export const getUserById = query({
   args: { clerkId: v.string() },
@@ -115,5 +115,23 @@ export const deleteUser = internalMutation({
     }
 
     await ctx.db.delete(user._id);
+  },
+});
+
+export const updateAccounType = mutation({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
   },
 });

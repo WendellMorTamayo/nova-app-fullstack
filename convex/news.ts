@@ -328,7 +328,7 @@ export const removeFromLikes = mutation({
 });
 
 export const getLikesByNewsId = query({
-  args: { newsId: v.optional(v.string()) },
+  args: { newsId: v.id("news") },
   handler: async (ctx, args) => {
     const { newsId } = args;
     const identity = await ctx.auth.getUserIdentity();
@@ -350,7 +350,8 @@ export const getLikesByNewsId = query({
       .filter((likes) => likes.eq(likes.field("user"), user[0]._id))
       .filter((likes) => likes.eq(likes.field("news"), newsId))
       .collect();
-
+    console.log("sadasdasdsa");
+    console.log(news);
     return news;
   },
 });

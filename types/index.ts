@@ -100,7 +100,7 @@ export interface AudioProps {
   audioUrl: string;
   author: string;
   imageUrl: string;
-  newsId: string;
+  newsId: Id<"news">;
 }
 
 export interface AudioContextType {

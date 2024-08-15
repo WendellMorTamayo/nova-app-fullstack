@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Heart, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export function AddToLikesButton({ newsId }: any) {
@@ -12,7 +12,11 @@ export function AddToLikesButton({ newsId }: any) {
   const news = useQuery(api.news.getLikesByNewsId, { newsId: newsId });
   const addToLikes = useMutation(api.news.addToLikes);
   const removeFromLikes = useMutation(api.news.removeFromLikes);
-  const [isLiked, setIsLiked] = useState(news?.length! > 0);
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    setIsLiked(news?.length! > 0);
+  }, [news]);
 
   const handleClick = () => {
     if (!isLiked) {

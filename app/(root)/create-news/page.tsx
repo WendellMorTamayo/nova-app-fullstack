@@ -73,7 +73,7 @@ const CreateNews = () => {
     },
   });
 
-  const voiceCategories = ["Alloy", "Shimmer", "Nova", "Echo", "Fable", "Onyx"];
+  const voiceCategories = ["alloy", "shimmer", "nova", "echo", "fable", "onyx"];
 
   // 2. Define a submit handler.
   async function onSubmit(data: z.infer<typeof formSchema>) {

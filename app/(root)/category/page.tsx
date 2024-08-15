@@ -27,13 +27,13 @@ const Category = () => {
         "h-[calc(100vh-400px)]": audio?.audioUrl,
       })}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 overflow-auto">
         {categorizedNews
           .filter(
             (news) => news?.news?.length != undefined && news?.news?.length > 0
           )
           .map(({ category, news }) => (
-            <>
+            <div className="flex flex-col gap-4" key={category}>
               <h1
                 className="text-32 font-bold text-white-1 capitalize"
                 key={category}
@@ -54,7 +54,7 @@ const Category = () => {
                   )
                 )}
               </div>
-            </>
+            </div>
           ))}
       </div>
     </section>

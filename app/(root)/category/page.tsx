@@ -1,4 +1,5 @@
 "use client";
+import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -7,6 +8,7 @@ import React from "react";
 const Category = () => {
   const categories = ["sports", "entertainment", "technology", "business"];
   const newsData = useQuery(api.news.getAllNews);
+
   const categorizedNews = categories.map((cat) => {
     return {
       category: cat,
@@ -14,6 +16,8 @@ const Category = () => {
     };
   });
   let count = 0;
+
+  if (!categorizedNews) return <LoaderSpinner />;
   return (
     <div className="mt-4 flex flex-col gap-9">
       <section className="flex flex-col gap-5">

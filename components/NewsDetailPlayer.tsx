@@ -55,6 +55,7 @@ const NewsDetailPlayer = ({
       author,
       newsId,
     });
+    console.log(audioUrl);
   };
 
   if (!imageUrl || !authorImageUrl) return <LoaderSpinner />;

@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyState from "@/components/EmptyState";
+import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ const Likes = () => {
   const likedNews = useQuery(api.news.getNewsByMultipleIds, {
     newsIds: likesIds!,
   });
+  if (!likedNews) return <LoaderSpinner />;
   return (
     <div className="mt-4 flex flex-col gap-9">
       <section className="flex flex-col gap-5">

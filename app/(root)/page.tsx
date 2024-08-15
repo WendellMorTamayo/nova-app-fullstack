@@ -7,7 +7,7 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push("/trending");
+    router.push("/discover");
   }, [router]);
 
   return (

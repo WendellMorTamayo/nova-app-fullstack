@@ -30,16 +30,7 @@ export default defineSchema({
     imageUrl: v.string(),
     clerkId: v.string(),
     name: v.string(),
-  }),
-
-  userPlaylist: defineTable({
-    user: v.id("users"),
-    playlistName: v.string(),
-  }),
-
-  playlistContent: defineTable({
-    playlist: v.id("userPlaylist"),
-    news: v.id("news"),
+    accountType: v.optional(v.string()),
   }),
 
   userRecents: defineTable({

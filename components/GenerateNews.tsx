@@ -1,5 +1,5 @@
 import { GenerateNewsProps } from "@/types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useUploadFiles } from "@xixixao/uploadstuff/react";
 import { generateUploadUrl } from "@/convex/files";
 import { useToast } from "@/components/ui/use-toast";
+import { isPortInUse } from "@/utils/checkPort";
 
 const useGenerateNews = ({
   setAudio,
@@ -19,15 +20,31 @@ const useGenerateNews = ({
   setVoicePrompt,
   setNewsType,
 }: GenerateNewsProps) => {
+  // const [portInUse, setPortInUse] = useState(false);
+  // const port = 8083;
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   const { startUpload } = useUploadFiles(generateUploadUrl);
   const getNewsAudio = useAction(api.ai.generateAudioAction);
   const getAudioUrl = useMutation(api.news.getUrl);
-  const getContent = useAction(api.ai.generateScriptAction);
+  const getContent = useAction(api.tasks.generateScriptAction);
+  // useEffect(() => {
+  //   const checkServer = async () => {
+  //     const result = await isPortInUse(port);
+  //     setPortInUse(result);
+  //   };
+
+  //   checkServer();
+  // }, []);
 
   const generateNews = async () => {
+    // if (!portInUse) {
+    //   toast({
+    //     title: "Error",
+    //   });
+    //   return setIsGenerating(false);
+    // }
     setIsGenerating(true);
     setAudio("");
 
@@ -96,7 +113,7 @@ const GenerateNews = (props: GenerateNewsProps) => {
   const { isGenerating, generateNews } = useGenerateNews(props);
 
   return (
-    <div> 
+    <div>
       <div className="flex flex-col gap-2.5">
         <Label className="text-16 font-bold text-white-1">
           AI Prompt to Generate Podcast

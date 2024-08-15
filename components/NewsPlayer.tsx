@@ -10,6 +10,8 @@ import { Progress } from "./ui/progress";
 import { formatTime } from "@/lib/formatTime";
 import { AddToLikesButton } from "./LikeButton";
 import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const NewsPlayer = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -20,6 +22,7 @@ const NewsPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const { audio } = useAudio();
 
+  const [newsId, setNewsId] = useState(audio?.newsId);
   const isOwner = user?.id === audio?.author;
 
   const togglePlayPause = () => {
@@ -83,6 +86,7 @@ const NewsPlayer = () => {
           setIsPlaying(true);
         });
       }
+      setNewsId(audio?.newsId);
     } else {
       audioElement?.pause();
       setIsPlaying(true);
@@ -167,7 +171,7 @@ const NewsPlayer = () => {
           <h2 className="text-16 font-normal text-white-2 max-md:hidden">
             {formatTime(duration)}
           </h2>
-          {!isOwner ? <AddToLikesButton /> : null}
+          {!isOwner ? <AddToLikesButton key={newsId} newsId={newsId} /> : null}
           <div className="flex w-full gap-2">
             <Image
               src={isMuted ? "/icons/unmute.svg" : "/icons/mute.svg"}

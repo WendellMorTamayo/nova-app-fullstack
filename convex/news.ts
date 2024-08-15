@@ -248,13 +248,16 @@ export const addToRecents = mutation({
       .collect();
 
     if (news.length == 0) {
-      await ctx.db.insert("userRecents", { user: user[0]._id, news: newsId, lastPlayed: Date.now() });
+      await ctx.db.insert("userRecents", {
+        user: user[0]._id,
+        news: newsId,
+        lastPlayed: Date.now(),
+      });
     } else {
       await ctx.db.patch(news[0]._id, { lastPlayed: Date.now() });
     }
   },
 });
-
 export const getRecents = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -278,11 +281,10 @@ export const getRecents = query({
   },
 });
 
-export const createPlaylist = mutation({
-  args: { playlistName: v.string() },
+export const addToLikes = mutation({
+  args: { newsId: v.id("news") },
   handler: async (ctx, args) => {
-    const { playlistName } = args;
-
+    const { newsId } = args;
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError("NotAuthenticated");
@@ -297,14 +299,61 @@ export const createPlaylist = mutation({
       throw new ConvexError("user not found");
     }
 
-    await ctx.db.insert("userPlaylist", {
-      user: user[0]._id,
-      playlistName: playlistName,
-    });
+    await ctx.db.insert("userLikes", { user: user[0]._id, news: newsId });
   },
 });
 
-export const getUserPlaylists = query({
+export const removeFromLikes = mutation({
+  args: { newsId: v.id("userLikes") },
+  handler: async (ctx, args) => {
+    const { newsId } = args;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    await ctx.db.delete(newsId);
+  },
+});
+
+export const getLikesByNewsId = query({
+  args: { newsId: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const { newsId } = args;
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .collect();
+
+    if (user.length == 0) {
+      throw new ConvexError("user not found");
+    }
+
+    const news = await ctx.db
+      .query("userLikes")
+      .filter((likes) => likes.eq(likes.field("user"), user[0]._id))
+      .filter((likes) => likes.eq(likes.field("news"), newsId))
+      .collect();
+
+    return news;
+  },
+});
+
+export const getLikes = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -320,25 +369,11 @@ export const getUserPlaylists = query({
       throw new ConvexError("user not found");
     }
 
-    const playlists = await ctx.db
-      .query("userPlaylist")
-      .filter((playlist) => playlist.eq(playlist.field("user"), user[0]._id))
+    const likes = await ctx.db
+      .query("userLikes")
+      .filter((likes) => likes.eq(likes.field("user"), user[0]._id))
       .collect();
 
-    return playlists;
-  },
-});
-
-export const getPlaylistContents = query({
-  args: { playlistId: v.id("userPlaylist") },
-  handler: async (ctx, args) => {
-    const { playlistId } = args;
-
-    const news = await ctx.db
-      .query("playlistContent")
-      .filter((content) => content.eq(content.field("playlist"), playlistId))
-      .collect();
-
-    return news;
+    return likes;
   },
 });

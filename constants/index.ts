@@ -22,11 +22,7 @@ export const authenticatedSidebarLinks = [
     label: "Recent",
     imgUrl: "/icons/recent.svg",
   },
-  {
-    route: "/playlist",
-    label: "Playlist",
-    imgUrl: "/icons/playlist.svg",
-  },
+
   {
     route: "/likes",
     label: "Likes",

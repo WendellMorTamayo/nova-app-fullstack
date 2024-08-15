@@ -37,7 +37,7 @@ export default function RootLayout({
             </div>
           </div>
         </section>
-        <RightSidebar />
+        {isNewsActive && <RightSidebar />}
       </main>
       <NewsPlayer />
     </div>

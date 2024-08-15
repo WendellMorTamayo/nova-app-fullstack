@@ -29,6 +29,7 @@ const useGenerateNews = ({
   const getNewsAudio = useAction(api.ai.generateAudioAction);
   const getAudioUrl = useMutation(api.news.getUrl);
   const getContent = useAction(api.tasks.generateScriptAction);
+  const [portInUse, setPortInUse] = useState(false);
   // useEffect(() => {
   //   const checkServer = async () => {
   //     const result = await isPortInUse(port);
@@ -37,14 +38,23 @@ const useGenerateNews = ({
 
   //   checkServer();
   // }, []);
+  const checkServer = async () => {
+    const result = await isPortInUse(8083);
+    setPortInUse(result);
+  };
 
   const generateNews = async () => {
-    // if (!portInUse) {
-    //   toast({
-    //     title: "Error",
-    //   });
-    //   return setIsGenerating(false);
-    // }
+    await checkServer();
+
+    if (!portInUse) {
+      toast({
+        title: "Server Error",
+        variant: "destructive",
+      });
+      setIsGenerating(false);
+      return { isGenerating, generateNews };
+    }
+
     setIsGenerating(true);
     setAudio("");
 

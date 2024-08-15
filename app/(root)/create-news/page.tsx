@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { isPortInUse } from "@/utils/checkPort";
 
 const formSchema = z.object({
   newsTitle: z.string().min(2),
@@ -80,11 +81,11 @@ const CreateNews = () => {
     try {
       setIsSubmitting(true);
       if (!audioUrl || !imageUrl || !voiceType) {
-        toast({
-          title: "Please generate audio and Image",
-        });
+        // toast({
+        //   title: "Please generate audio and Image",
+        // });
         setIsSubmitting(false);
-        throw new Error("Please generate audio and image");
+        // throw new Error("Please generate audio and image");
       }
 
       const news = await createNews({
@@ -106,10 +107,10 @@ const CreateNews = () => {
       });
       router.push("/");
     } catch (error) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-      });
+      // toast({
+      //   title: "Server Error",
+      //   variant: "destructive",
+      // });
       setIsSubmitting(false);
     }
   }

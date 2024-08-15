@@ -1,3 +1,4 @@
+"use server";
 import net from "net";
 
 export const isPortInUse = (port: number): Promise<boolean> => {

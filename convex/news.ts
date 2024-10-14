@@ -143,52 +143,50 @@ export const getNewsByNewsType = query({
 
 export const getNewsBySearch = query({
   args: {
-    search: v.string(),
+    search: v.optional(v.string()),
+    categories: v.optional(v.union(v.string(), v.array(v.string()))),
   },
   handler: async (ctx, args) => {
-    if (args.search === "") {
-      return await ctx.db.query("news").order("desc").collect();
+    let newsQuery = ctx.db.query("news");
+
+    let titleSearch;
+    if (args.search) {
+      titleSearch = newsQuery.withSearchIndex("search_title", (q) =>
+        q.search("newsTitle", args.search!)
+      );
     }
 
-    const authorSearch = await ctx.db
-      .query("news")
-      .withSearchIndex("search_author", (q) => q.search("author", args.search))
-      .take(10);
+    let categorySearch;
+    if (args.categories) {
+      const categoriesArray = Array.isArray(args.categories)
+        ? args.categories
+        : [args.categories];
 
-    if (authorSearch.length > 0) {
-      return authorSearch;
+      if (categoriesArray.length > 0) {
+        categorySearch = titleSearch
+          ? titleSearch.filter((q) =>
+              q.or(
+                ...categoriesArray.map((category) =>
+                  q.eq(q.field("newsType"), category)
+                )
+              )
+            )
+          : newsQuery.filter((q) =>
+              q.or(
+                ...categoriesArray.map((category) =>
+                  q.eq(q.field("newsType"), category)
+                )
+              )
+            ).order("desc");
+      }
     }
 
-    const titleSearch = await ctx.db
-      .query("news")
-      .withSearchIndex("search_title", (q) =>
-        q.search("newsTitle", args.search)
-      )
-      .take(10);
+    const results = categorySearch ? await categorySearch.collect() : await newsQuery.collect();
+    const sortedResults = results.sort(
+      (a, b) => b._creationTime - a._creationTime
+    );
 
-    if (titleSearch.length > 0) {
-      return titleSearch;
-    }
-
-    const descriptionSearch = await ctx.db
-      .query("news")
-      .withSearchIndex("search_body", (q) =>
-        q.search("newsDescription", args.search)
-      )
-      .take(10);
-
-    if (descriptionSearch.length > 0) {
-      return descriptionSearch;
-    } else if (titleSearch.length > 0) {
-      return titleSearch;
-    } else {
-      return await ctx.db
-        .query("news")
-        .withSearchIndex("search_body", (q) =>
-          q.search("newsDescription", args.search)
-        )
-        .take(10);
-    }
+    return sortedResults;
   },
 });
 
@@ -335,6 +333,9 @@ export const getLikesByNewsId = query({
     if (!identity) {
       throw new ConvexError("NotAuthenticated");
     }
+
+    console.log("Identity:", identity);
+    console.log("Identity email:", identity.email);
 
     const user = await ctx.db
       .query("users")

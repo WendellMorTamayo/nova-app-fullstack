@@ -11,11 +11,11 @@ import { useQuery } from "convex/react";
 import React from "react";
 
 const Discover = ({
-  searchParams: { search },
+  searchParams: { search, categories},
 }: {
-  searchParams: { search: string };
+  searchParams: { search: string , categories?: string[]};
 }) => {
-  const newsData = useQuery(api.news.getNewsBySearch, { search: search || "" });
+  const newsData = useQuery(api.news.getNewsBySearch, { search: search , categories: categories });
   const { audio } = useAudio();
 
   if (!newsData) return <LoaderSpinner />;

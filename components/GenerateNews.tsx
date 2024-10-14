@@ -29,6 +29,7 @@ const useGenerateNews = ({
   const getNewsAudio = useAction(api.ai.generateAudioAction);
   const getAudioUrl = useMutation(api.news.getUrl);
   const getContent = useAction(api.tasks.generateScriptAction);
+  const [portInUse, setPortInUse] = useState(false);
   // useEffect(() => {
   //   const checkServer = async () => {
   //     const result = await isPortInUse(port);
@@ -37,14 +38,23 @@ const useGenerateNews = ({
 
   //   checkServer();
   // }, []);
+  const checkServer = async () => {
+    const result = await isPortInUse(8083);
+    setPortInUse(result);
+  };
 
   const generateNews = async () => {
-    // if (!portInUse) {
-    //   toast({
-    //     title: "Error",
-    //   });
-    //   return setIsGenerating(false);
-    // }
+    await checkServer();
+
+    if (!portInUse) {
+      toast({
+        title: "Server Error",
+        variant: "destructive",
+      });
+      setIsGenerating(false);
+      return { isGenerating, generateNews };
+    }
+
     setIsGenerating(true);
     setAudio("");
 
@@ -128,7 +138,6 @@ const GenerateNews = (props: GenerateNewsProps) => {
       </div>
       <div className="mt-5 w-full max-w-[200px]">
         <Button
-          type="submit"
           className="text-16 bg-purple-1 py-4 font-bold text-white-1"
           onClick={generateNews}
         >

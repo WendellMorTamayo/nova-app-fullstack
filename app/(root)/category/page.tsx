@@ -1,4 +1,5 @@
 "use client";
+import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ const Category = () => {
   const { audio } = useAudio();
   const categories = ["sports", "entertainment", "technology", "business"];
   const newsData = useQuery(api.news.getAllNews);
+
   const categorizedNews = categories.map((cat) => {
     return {
       category: cat,
@@ -17,19 +19,21 @@ const Category = () => {
     };
   });
   let count = 0;
+
+  if (!categorizedNews) return <LoaderSpinner />;
   return (
     <section
       className={cn("flex flex-col mt-4 gap-4 h-[100vh-70px]", {
         "h-[calc(100vh-400px)]": audio?.audioUrl,
       })}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 overflow-auto">
         {categorizedNews
           .filter(
             (news) => news?.news?.length != undefined && news?.news?.length > 0
           )
           .map(({ category, news }) => (
-            <>
+            <div className="flex flex-col gap-4" key={category}>
               <h1
                 className="text-32 font-bold text-white-1 capitalize"
                 key={category}
@@ -50,7 +54,7 @@ const Category = () => {
                   )
                 )}
               </div>
-            </>
+            </div>
           ))}
       </div>
     </section>

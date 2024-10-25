@@ -181,6 +181,14 @@ export const getNewsBySearch = query({
     }
 
     const results = categorySearch ? await categorySearch.collect() : await newsQuery.collect();
+    const filteredResults = results.filter((item) =>
+      args.search ? item.newsTitle.includes(args.search) : true
+    );
+
+    if (filteredResults.length === 0) {
+      return { message: "No results found." };
+    }
+
     const sortedResults = results.sort(
       (a, b) => b._creationTime - a._creationTime
     );

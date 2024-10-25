@@ -190,7 +190,7 @@ const CreateNews = () => {
                     <Textarea
                       placeholder="Write a short description"
                       {...field}
-                      className="input-class focus-visible:ring-orange-1 "
+                      className="input-class focus-visible:ring-orange-1 min-h-[120px]"
                     />
                   </FormControl>
 

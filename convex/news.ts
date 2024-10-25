@@ -1,6 +1,5 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { useMutation } from "convex/react";
 
 export const getUrl = mutation({
   args: {

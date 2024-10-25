@@ -4,6 +4,7 @@ import "./globals.css";
 import ConvexClerkProvider from "../providers/ConvexClerkProvider";
 import AudioProvider from "@/providers/AudioProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
             >
               {children}
             </ThemeProvider>
+            <Toaster />
           </body>
         </AudioProvider>
       </html>

@@ -8,9 +8,7 @@ import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { v4 as uuidv4 } from "uuid";
 import { useUploadFiles } from "@xixixao/uploadstuff/react";
-import { generateUploadUrl } from "@/convex/files";
 import { useToast } from "@/components/ui/use-toast";
-import { isPortInUse } from "@/utils/checkPort";
 
 const useGenerateNews = ({
   setAudio,
@@ -103,7 +101,6 @@ const GenerateNews = (props: GenerateNewsProps) => {
           AI Prompt to Generate Podcast
         </Label>
         <Textarea
-          disabled={true}
           className="input-class font-light focus-visible: ring-orange-1 min-h-[200px]"
           placeholder="Provide Text to Generate  Audio"
           rows={5}

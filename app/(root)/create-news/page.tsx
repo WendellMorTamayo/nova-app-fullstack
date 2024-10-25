@@ -58,7 +58,7 @@ const CreateNews = () => {
   const [audioUrl, setAudioUrl] = useState("");
   const [audioDuration, setAudioDuration] = useState(0);
 
-  const [voiceType, setVoiceType] = useState<string | null>(null);
+  const [voiceType, setVoiceType] = useState<string>("");
   const [newsType, setNewsType] = useState<string>("");
   const [voicePrompt, setVoicePrompt] = useState("");
 
@@ -81,9 +81,9 @@ const CreateNews = () => {
     try {
       setIsSubmitting(true);
       if (!audioUrl || !imageUrl || !voiceType) {
-        // toast({
-        //   title: "Please generate audio and Image",
-        // });
+        toast({
+          title: "Please generate audio and Image",
+        });
         setIsSubmitting(false);
         // throw new Error("Please generate audio and image");
       }

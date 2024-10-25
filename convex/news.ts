@@ -1,5 +1,5 @@
-import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import {ConvexError, v} from "convex/values";
+import {mutation, query} from "./_generated/server";
 
 export const getUrl = mutation({
   args: {
@@ -23,8 +23,8 @@ export const createNews = mutation({
     voicePrompt: v.string(),
     views: v.number(),
     audioDuration: v.number(),
-    audioStorageId: v.id("_storage"),
-    imageStorageId: v.id("_storage"),
+    audioStorageId: v.optional(v.id("_storage")),
+    imageStorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     const newsType = "";
@@ -41,14 +41,14 @@ export const createNews = mutation({
     if (user.length == 0) {
       throw new ConvexError("user not found");
     }
-    const news = await ctx.db.insert("news", {
+
+    return await ctx.db.insert("news", {
       ...args,
       user: user[0]._id,
       author: user[0].name,
       authorId: user[0].clerkId,
       authorImageUrl: user[0].imageUrl,
     });
-    return news;
   },
 });
 
@@ -215,6 +215,7 @@ export const deleteNews = mutation({
     return await ctx.db.delete(args.newsId);
   },
 });
+
 export const updateViews = mutation({
   args: {
     newsId: v.id("news"),

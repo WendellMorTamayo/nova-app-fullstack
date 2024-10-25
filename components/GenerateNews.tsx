@@ -20,8 +20,6 @@ const useGenerateNews = ({
   setVoicePrompt,
   setNewsType,
 }: GenerateNewsProps) => {
-  // const [portInUse, setPortInUse] = useState(false);
-  // const port = 8083;
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
@@ -29,32 +27,8 @@ const useGenerateNews = ({
   const getNewsAudio = useAction(api.ai.generateAudioAction);
   const getAudioUrl = useMutation(api.news.getUrl);
   const getContent = useAction(api.tasks.generateScriptAction);
-  const [portInUse, setPortInUse] = useState(false);
-  // useEffect(() => {
-  //   const checkServer = async () => {
-  //     const result = await isPortInUse(port);
-  //     setPortInUse(result);
-  //   };
-
-  //   checkServer();
-  // }, []);
-  const checkServer = async () => {
-    const result = await isPortInUse(8083);
-    setPortInUse(result);
-  };
 
   const generateNews = async () => {
-    await checkServer();
-
-    if (!portInUse) {
-      toast({
-        title: "Server Error",
-        variant: "destructive",
-      });
-      setIsGenerating(false);
-      return { isGenerating, generateNews };
-    }
-
     setIsGenerating(true);
     setAudio("");
 
@@ -70,7 +44,7 @@ const useGenerateNews = ({
         prompt: voicePrompt,
       });
       const separatedContent = content?.split(">>>", 2);
-
+      console.log("SeparatedContent:: ", separatedContent);
       if (!separatedContent) {
         toast({
           title: "error generating voice prompt",
@@ -129,7 +103,8 @@ const GenerateNews = (props: GenerateNewsProps) => {
           AI Prompt to Generate Podcast
         </Label>
         <Textarea
-          className="input-class font-light focus-visible: ring-orange-1"
+          disabled={true}
+          className="input-class font-light focus-visible: ring-orange-1 min-h-[200px]"
           placeholder="Provide Text to Generate  Audio"
           rows={5}
           value={props.voicePrompt}

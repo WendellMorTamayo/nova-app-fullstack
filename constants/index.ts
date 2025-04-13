@@ -22,11 +22,15 @@ export const authenticatedSidebarLinks = [
     label: "Recent",
     imgUrl: "/icons/recent.svg",
   },
-
   {
     route: "/likes",
     label: "Likes",
     imgUrl: "/icons/likes.svg",
+  },
+  {
+    route: "/settings/subscription",
+    label: "Subscription",
+    imgUrl: "/icons/credit-card.svg",
   },
 ];
 
@@ -35,3 +39,11 @@ export const createNewsLink = {
   label: "Create News",
   imgUrl: "/discover.svg",
 };
+
+export const adminLinks = [
+  {
+    route: "/admin/stats",
+    label: "Statistics",
+    imgUrl: "/icons/chart.svg",
+  },
+];

@@ -3,6 +3,7 @@
 import {
   sidebarLinks,
   authenticatedSidebarLinks,
+  adminLinks,
   createNewsLink,
 } from "@/constants";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,9 @@ const LeftSidebar = () => {
   const { user } = useClerk();
   const { audio } = useAudio();
   const router = useRouter();
+  
+  // This would come from user's data. For now, let's assume admin based on email
+  const isAdmin = user?.emailAddresses?.[0]?.emailAddress?.includes("admin");
 
   const userButtonAppearance = {
     elements: {
@@ -41,9 +45,13 @@ const LeftSidebar = () => {
 
   return (
     <section
-      className={cn("left_sidebar h-[calc(100vh-5px)]", {
-        "h-[calc(100vh-140px)]": audio?.audioUrl,
-      })}
+      className={cn(
+        "left_sidebar h-[calc(100vh-5px)] transition-all",
+        {
+          "h-[calc(100vh-140px)]": audio?.audioUrl,
+          "w-[70px] md:w-auto": true,
+        }
+      )}
     >
       <nav className="flex flex-col gap-1">
         <Link
@@ -52,12 +60,12 @@ const LeftSidebar = () => {
         >
           <Image src="/logo.png" alt="logo" width={70} height={70}></Image>
 
-          <h1 className="text-24 font-extrabold  text-white max-lg:hidden">
+          <h1 className="text-24 font-extrabold text-white hidden md:block">
             Nova
           </h1>
         </Link>
 
-        <span className="text-gray-400">MENU</span>
+        <span className="text-gray-400 text-xs md:text-sm px-2 md:px-0">MENU</span>
         {sidebarLinks.map(({ route, label, imgUrl }) => {
           const isActive =
             pathName === route || pathName.startsWith(`${route}`);
@@ -66,18 +74,18 @@ const LeftSidebar = () => {
               href={route}
               key={label}
               className={cn(
-                "flex gap-3 items-center py-4 max-lg:px-4 justify-center lg:justify-start",
-                { "bg-nav-focus border-r-8 border-[#5C67DE]": isActive }
+                "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
+                { "bg-nav-focus border-r-2 md:border-r-8 border-[#5C67DE]": isActive }
               )}
             >
-              <Image src={imgUrl} width={24} height={27} alt={imgUrl} />
-              <p>{label}</p>
+              <Image src={imgUrl} width={24} height={27} alt={imgUrl} className="flex-shrink-0" />
+              <p className="hidden md:block">{label}</p>
             </Link>
           );
         })}
         <Authenticated>
           <Separator className="bg-gray-1 overflow-auto justify-center items-center my-5 mx--5 w-[90%] flex" />
-          <span className="text-gray-400">LIBRARY</span>
+          <span className="text-gray-400 text-xs md:text-sm px-2 md:px-0">LIBRARY</span>
           {authenticatedSidebarLinks.map(({ route, label, imgUrl }) => {
             const isActive =
               pathName === route || pathName.startsWith(`${route}`);
@@ -86,12 +94,12 @@ const LeftSidebar = () => {
                 href={route}
                 key={label}
                 className={cn(
-                  "flex gap-3 items-center py-4 max-lg:px-4 justify-center lg:justify-start",
-                  { "bg-nav-focus border-r-8 border-[#5C67DE]": isActive }
+                  "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
+                  { "bg-nav-focus border-r-2 md:border-r-8 border-[#5C67DE]": isActive }
                 )}
               >
-                <Image src={imgUrl} width={24} height={27} alt={imgUrl} />
-                <p>{label}</p>
+                <Image src={imgUrl} width={24} height={27} alt={imgUrl} className="flex-shrink-0" />
+                <p className="hidden md:block">{label}</p>
               </Link>
             );
           })}
@@ -101,9 +109,9 @@ const LeftSidebar = () => {
             href={createNewsLink.route}
             key={createNewsLink.label}
             className={cn(
-              "flex gap-3 items-center py-4 max-lg:px-4 justify-center lg:justify-start",
+              "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
               {
-                "bg-nav-focus border-r-8 border-blue-500":
+                "bg-nav-focus border-r-2 md:border-r-8 border-blue-500":
                   pathName === createNewsLink.route ||
                   pathName.startsWith(`${createNewsLink.route}`),
               }
@@ -114,14 +122,40 @@ const LeftSidebar = () => {
               width={24}
               height={27}
               alt={createNewsLink.imgUrl}
+              className="flex-shrink-0"
             />
-            <p>{createNewsLink.label}</p>
+            <p className="hidden md:block">{createNewsLink.label}</p>
           </Link>
+          
+          {isAdmin && (
+            <>
+              <Separator className="bg-gray-1 h-[0.5px] overflow-auto justify-center items-center my-5 mx--5 w-[90%] flex" />
+              <span className="text-gray-400 text-xs md:text-sm px-2 md:px-0">ADMIN</span>
+              
+              {adminLinks.map(({ route, label, imgUrl }) => {
+                const isActive =
+                  pathName === route || pathName.startsWith(`${route}`);
+                return (
+                  <Link
+                    href={route}
+                    key={label}
+                    className={cn(
+                      "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
+                      { "bg-nav-focus border-r-2 md:border-r-8 border-purple-500": isActive }
+                    )}
+                  >
+                    <Image src={imgUrl} width={24} height={27} alt={imgUrl} className="flex-shrink-0" />
+                    <p className="hidden md:block">{label}</p>
+                  </Link>
+                );
+              })}
+            </>
+          )}
         </Authenticated>
       </nav>
       <SignedOut>
-        <div className="flex-center w-full pb-14 max-lg:px-4 lg:pr-8">
-          <Button asChild className="text-16 w-full bg-purple-1 font-extrabold">
+        <div className="flex justify-center w-full pb-8 md:pb-14 px-2 md:px-4">
+          <Button asChild className="text-xs md:text-sm w-full bg-purple-1 font-bold md:font-extrabold">
             <Link href="/sign-in">Sign in</Link>
           </Button>
         </div>
@@ -130,14 +164,14 @@ const LeftSidebar = () => {
         <div className="flex flex-col items-center">
           <PricingDialog />
           <div
-            className={"flex flex-row mb-12 mr-6"}
+            className={"flex flex-row mb-8 md:mb-12 mx-2 md:mr-6 justify-center md:justify-start"}
           >
             <UserButton appearance={userButtonAppearance} />
-            <div className="flex flex-col mx-4">
-              <span>{user?.fullName}</span>
+            <div className="flex-col mx-4 hidden md:flex">
+              <span className="truncate max-w-[120px]">{user?.fullName}</span>
               <Link
                 href={`/profile/${user?.id}`}
-                className="underline cursor-pointer text-gray-1 font-extralight"
+                className="underline cursor-pointer text-gray-1 font-extralight text-sm"
               >
                 View profile
               </Link>

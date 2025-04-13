@@ -113,7 +113,7 @@ const NewsPlayer = () => {
         className="w-full"
         max={duration}
       />
-      <section className="glassmorphism-black flex h-[112px] w-full items-center justify-between px-4 max-md:justify-center max-md:gap-5 md:px-12">
+      <section className="glassmorphism-black flex flex-wrap sm:flex-nowrap h-auto sm:h-[112px] w-full items-center justify-between px-2 sm:px-4 md:px-12 py-3 sm:py-0">
         <audio
           ref={audioRef}
           src={audio?.audioUrl}
@@ -121,7 +121,29 @@ const NewsPlayer = () => {
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={handleAudioEnded}
         />
-        <div className="flex items-center gap-4 max-md:hidden ">
+        
+        {/* Mobile view: simplified layout */}
+        <div className="flex items-center gap-2 sm:hidden w-full mb-2">
+          <Link href={`/podcast/${audio?.newsId}`}>
+            <Image
+              src={audio?.imageUrl! || "/step-forward 2.svg"}
+              width={40}
+              height={40}
+              alt="player1"
+              className="aspect-square rounded-md"
+            />
+          </Link>
+          <div className="flex flex-1 flex-col">
+            <h2 className="text-xs truncate font-semibold text-white-1">
+              {audio?.title}
+            </h2>
+            <p className="text-xs font-normal text-white-2">{audio?.author}</p>
+          </div>
+          {!isOwner ? <AddToLikesButton key={newsId} newsId={newsId} /> : null}
+        </div>
+        
+        {/* Desktop view: original layout */}
+        <div className="hidden sm:flex items-center gap-4">
           <Link href={`/podcast/${audio?.newsId}`}>
             <Image
               src={audio?.imageUrl! || "/step-forward 2.svg"}
@@ -138,7 +160,9 @@ const NewsPlayer = () => {
             <p className="text-12 font-normal text-white-2">{audio?.author}</p>
           </div>
         </div>
-        <div className="flex cursor-pointer gap-2 md:gap-6 ">
+        
+        {/* Player controls - similar for both views */}
+        <div className="flex cursor-pointer gap-2 md:gap-6 justify-center">
           <div className="flex items-center gap-1.5">
             <Image
               src={"/icons/reverse.svg"}
@@ -146,8 +170,9 @@ const NewsPlayer = () => {
               height={24}
               alt="rewind"
               onClick={rewind}
+              className="cursor-pointer"
             />
-            <h2 className="text-12 font-bold text-white-4">-5</h2>
+            <h2 className="text-xs md:text-12 font-bold text-white-4">-5</h2>
           </div>
           <Image
             src={!isPlaying ? "/circle-play 1.svg" : "/angle-left 2.svg"}
@@ -155,20 +180,24 @@ const NewsPlayer = () => {
             height={30}
             alt="play"
             onClick={togglePlayPause}
+            className="cursor-pointer"
           />
           <div className="flex items-center gap-1.5">
-            <h2 className="text-12 font-bold text-white-4">+5</h2>
+            <h2 className="text-xs md:text-12 font-bold text-white-4">+5</h2>
             <Image
               src={"/icons/forward.svg"}
               width={24}
               height={24}
               alt="forward"
               onClick={forward}
+              className="cursor-pointer"
             />
           </div>
         </div>
-        <div className="flex items-center gap-6">
-          <h2 className="text-16 font-normal text-white-2 max-md:hidden">
+        
+        {/* Additional controls - different for mobile/desktop */}
+        <div className="hidden sm:flex items-center gap-6">
+          <h2 className="text-16 font-normal text-white-2">
             {formatTime(duration)}
           </h2>
           {!isOwner ? <AddToLikesButton key={newsId} newsId={newsId} /> : null}
@@ -182,6 +211,21 @@ const NewsPlayer = () => {
               className="cursor-pointer"
             />
           </div>
+        </div>
+        
+        {/* Mobile additional controls */}
+        <div className="flex sm:hidden items-center justify-between w-full">
+          <span className="text-xs text-white-2">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+          <Image
+            src={isMuted ? "/icons/unmute.svg" : "/icons/mute.svg"}
+            width={20}
+            height={20}
+            alt="mute unmute"
+            onClick={toggleMute}
+            className="cursor-pointer"
+          />
         </div>
       </section>
     </div>

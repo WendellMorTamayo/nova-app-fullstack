@@ -19,14 +19,14 @@ function PricingDialog() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         {!isSubscribed && (
-          <PulsatingButton className="my-12 mr-8 w-full flex items-center justify-center bg-purple-1">
+          <PulsatingButton className="my-4 sm:my-8 md:my-12 w-full flex items-center justify-center bg-purple-1">
             Get Premium
           </PulsatingButton>
         )}
       </AlertDialogTrigger>
-      <AlertDialogContent className="max-w-4xl bg-black-2">
+      <AlertDialogContent className="max-w-[95vw] md:max-w-2xl lg:max-w-4xl bg-black-2 overflow-y-auto max-h-[90vh]">
         <AlertDialogHeader className="justify-start">
-          <AlertDialogTitle>Choose Your Plan</AlertDialogTitle>
+          <AlertDialogTitle className="text-xl sm:text-2xl">Choose Your Plan</AlertDialogTitle>
           <AlertDialogDescription>
             Select the plan that best fits your needs.
           </AlertDialogDescription>
@@ -34,8 +34,8 @@ function PricingDialog() {
         <div className="flex flex-col items-center w-full">
           <PricingCards />
         </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="sm:flex-row gap-2">
+          <AlertDialogCancel className="sm:mt-0 w-full sm:w-auto">Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

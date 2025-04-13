@@ -13,32 +13,50 @@ type Metadata = {
 export const pay = action({
   args: {},
   handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
+    try {
+      const user = await ctx.auth.getUserIdentity();
 
-    if (!user) {
-      throw new Error("you must be logged in to subscribe");
+      if (!user) {
+        return { error: true, message: "You must be logged in to subscribe" };
+      }
+
+      if (!user.emailVerified) {
+        return { error: true, message: "You must have a verified email to subscribe" };
+      }
+
+      const domain = process.env.HOSTING_URL ?? "http://localhost:3000";
+      const stripe = new Stripe(process.env.STRIPE_KEY!, {
+        apiVersion: "2024-06-20",
+      });
+      
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{ price: process.env.PRICE_ID!, quantity: 1 }],
+        customer_email: user.email,
+        metadata: {
+          userId: user.subject,
+        },
+        mode: "subscription",
+        success_url: `${domain}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${domain}/payment/cancelled`,
+        // Add automatic tax calculation if needed
+        // automatic_tax: { enabled: true },
+        payment_method_types: ['card'],
+      });
+
+      // You could log payment attempt here for analytics
+      // await ctx.runMutation(internal.payments.logPaymentAttempt, {
+      //   userId: user.subject,
+      //   sessionId: session.id,
+      // });
+
+      return session.url!;
+    } catch (error) {
+      console.error("Payment creation error:", error);
+      return {
+        error: true,
+        message: (error as Error).message || "Failed to create payment session",
+      };
     }
-
-    if (!user.emailVerified) {
-      throw new Error("you must have a verified email to subscribe");
-    }
-
-    const domain = process.env.HOSTING_URL ?? "http://localhost:3000";
-    const stripe = new Stripe(process.env.STRIPE_KEY!, {
-      apiVersion: "2024-06-20",
-    });
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: process.env.PRICE_ID!, quantity: 1 }],
-      customer_email: user.email,
-      metadata: {
-        userId: user.subject,
-      },
-      mode: "subscription",
-      success_url: `${domain}`,
-      cancel_url: `${domain}`,
-    });
-
-    return session.url!;
   },
 });
 

@@ -10,9 +10,10 @@ const nextConfig = {
       { protocol: "https", hostname: "img.clerk.com" },
     ],
   },
-  // Enable optimizations
+  // CSS optimization configuration
   experimental: {
-    optimizeCss: true
+    // Only enable optimizeCss in production and when not on Vercel
+    optimizeCss: process.env.NODE_ENV === 'production' && !process.env.VERCEL ? true : false
   },
   // This setting enables proper loading.tsx behavior
   reactStrictMode: true,

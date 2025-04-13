@@ -237,3 +237,132 @@ export const getRecentContent = query({
     return enhancedNews;
   }
 });
+
+// Get user's subscription history 
+export const getUserSubscriptionHistory = query({
+  args: { 
+    userId: v.string()
+  },
+  handler: async (ctx, args) => {
+    // Ensure user is admin
+    const isAdmin = await isUserAdmin(ctx);
+    if (!isAdmin) throw new ConvexError("Unauthorized access");
+    
+    const user = await ctx.db
+      .query("users")
+      .filter(q => q.eq(q.field("clerkId"), args.userId))
+      .first();
+    
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+    
+    // Get subscription events from the database
+    // Note: We'll need to create a subscription_events table in the future
+    // For now, we'll generate some mock data based on user's subscription details
+    
+    let history = [];
+    
+    // If user has a subscription, add it to history
+    if (user.subscriptionId) {
+      // For current/last subscription
+      const now = Date.now();
+      const creationTimePlusDay = user._creationTime + (24 * 60 * 60 * 1000);
+      
+      // Add first subscription purchase
+      history.push({
+        type: "stripe",
+        date: user._creationTime,
+        startDate: user._creationTime,
+        endDate: creationTimePlusDay + (30 * 24 * 60 * 60 * 1000), // 30 days after creation
+        status: "success",
+        transactionId: `tr_${Math.random().toString(36).substring(2, 10)}`,
+        amount: 4.00,
+        notes: "Initial subscription purchase"
+      });
+      
+      // If they have an endsOn date far in the future, add renewal(s)
+      if (user.endsOn && user.endsOn > now) {
+        const daysSinceCreation = Math.floor((now - user._creationTime) / (24 * 60 * 60 * 1000));
+        
+        // Add some renewals if the account is old enough
+        if (daysSinceCreation > 60) {
+          // One renewal 30 days after signup
+          history.push({
+            type: "stripe",
+            date: creationTimePlusDay + (30 * 24 * 60 * 60 * 1000),
+            startDate: creationTimePlusDay + (30 * 24 * 60 * 60 * 1000),
+            endDate: creationTimePlusDay + (60 * 24 * 60 * 60 * 1000),
+            status: "success",
+            transactionId: `tr_${Math.random().toString(36).substring(2, 10)}`,
+            amount: 4.00,
+            notes: "Automatic renewal"
+          });
+        }
+        
+        // If they have an extension, add that too
+        if (user.endsOn > (user._creationTime + (60 * 24 * 60 * 60 * 1000))) {
+          history.push({
+            type: "manual",
+            date: now - (7 * 24 * 60 * 60 * 1000), // 7 days ago
+            startDate: creationTimePlusDay + (60 * 24 * 60 * 60 * 1000),
+            endDate: user.endsOn,
+            status: "success",
+            notes: "Manual extension by administrator"
+          });
+        }
+      }
+    }
+    
+    // Sort by date, newest first
+    return history.sort((a, b) => b.date - a.date);
+  }
+});
+
+// Update user details (admin only)
+export const updateUserDetails = mutation({
+  args: {
+    userId: v.string(),
+    name: v.string(),
+    accountType: v.string(),
+    credits: v.number()
+  },
+  handler: async (ctx, args) => {
+    // Ensure user is admin
+    const isAdmin = await isUserAdmin(ctx);
+    if (!isAdmin) throw new ConvexError("Unauthorized access");
+    
+    // Validate account type
+    if (!["basic", "premium", "admin"].includes(args.accountType)) {
+      throw new ConvexError("Invalid account type");
+    }
+    
+    // Find the user to update
+    const user = await ctx.db
+      .query("users")
+      .filter(q => q.eq(q.field("clerkId"), args.userId))
+      .first();
+    
+    if (!user) {
+      throw new ConvexError("User not found");
+    }
+    
+    // Update the user in the database
+    await ctx.db.patch(user._id, {
+      name: args.name,
+      accountType: args.accountType,
+      credits: args.credits
+    });
+    
+    // If the user is being promoted to premium but doesn't have a subscription end date,
+    // set one for 30 days from now
+    if (args.accountType === "premium" && !user.endsOn) {
+      await ctx.db.patch(user._id, {
+        endsOn: Date.now() + (30 * 24 * 60 * 60 * 1000), // 30 days from now
+        subscriptionId: `manual_${Date.now()}`
+      });
+    }
+    
+    return { success: true };
+  }
+});

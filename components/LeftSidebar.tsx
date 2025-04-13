@@ -12,20 +12,27 @@ import {
   SignedOut,
   useClerk,
   UserButton,
-  UserProfile,
 } from "@clerk/nextjs";
-import { ModeToggleButton } from "./ModeToggleButton";
 import { AnimatedLogo } from "./magicui/animated-logo";
 import { Spotlight } from "./magicui/spotlight";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Authenticated, useQuery } from "convex/react";
 import { useAudio } from "@/providers/AudioProvider";
 import { api } from "@/convex/_generated/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Plus, LayoutDashboard, BarChart2 } from "lucide-react";
 
 const LeftSidebar = () => {
   const pathName = usePathname();
@@ -164,56 +171,67 @@ const LeftSidebar = () => {
             );
           })}
           <Separator className="bg-gray-300 dark:bg-gray-1 h-[0.5px] overflow-auto justify-center items-center my-5 mx--5 w-[90%] flex" />
-
-          <Link
-            href={createNewsLink.route}
-            key={createNewsLink.label}
-            className={cn(
-              "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
-              {
-                "dark:bg-nav-focus-dark bg-nav-focus-light border-r-2 md:border-r-8 border-blue-500":
-                  pathName === createNewsLink.route ||
-                  pathName.startsWith(`${createNewsLink.route}`),
-              }
-            )}
-          >
-            <div className="w-6 h-6 flex-shrink-0 flex justify-center items-center">
-              <svg viewBox="0 0 24 24" width="24" height="24" className="text-gray-700 dark:text-white-1 fill-current">
-                <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z" />
-              </svg>
-            </div>
-            <p className="hidden md:block">{createNewsLink.label}</p>
-          </Link>
           
-          {/* Admin section - keeping this for sidebar navigation but removing Analytics link */}
+          {/* Admin Dropdown Menu */}
           {isAdmin && (
-            <>
-              {adminLinks.map(({ route, label, imgUrl }) => {
-                const isActive =
-                  pathName === route || pathName.startsWith(`${route}`);
-                  
-                // Skip the Analytics link since we've moved it to the UserButton
-                if (label === "Analytics" || label === "Stats") return null;
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className={cn(
+                  "flex gap-3 items-center w-full py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
+                  { 
+                    "dark:bg-nav-focus-dark bg-nav-focus-light border-r-2 md:border-r-8 border-purple-500": 
+                      pathName === "/admin/stats" || 
+                      pathName === "/create-news" || 
+                      pathName.startsWith("/admin/")
+                  }
+                )}>
+                  <div className="w-6 h-6 flex-shrink-0 flex justify-center items-center">
+                    <LayoutDashboard className="w-5 h-5 text-gray-700 dark:text-white-1" />
+                  </div>
+                  <span className="hidden md:block">Admin</span>
+                  <ChevronDown className="hidden md:block ml-auto h-4 w-4" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg">
+                <DropdownMenuLabel>Admin Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 
-                return (
-                  <Link
-                    href={route}
-                    key={label}
-                    className={cn(
-                      "flex gap-3 items-center py-3 md:py-4 px-2 md:px-4 justify-center md:justify-start",
-                      { "dark:bg-nav-focus-dark bg-nav-focus-light border-r-2 md:border-r-8 border-purple-500": isActive }
-                    )}
-                  >
-                    <div className="w-6 h-6 flex-shrink-0 flex justify-center items-center">
-                      <svg viewBox="0 0 24 24" width="24" height="24" className="text-gray-700 dark:text-white-1 fill-current">
-                        <path d="M3 3H11V11H3V3ZM3 13H11V21H3V13ZM13 3H21V11H13V3ZM13 13H21V21H13V13Z" />
-                      </svg>
-                    </div>
-                    <p className="hidden md:block">{label}</p>
-                  </Link>
-                );
-              })}
-            </>
+                {/* Create News Option */}
+                <DropdownMenuItem onClick={() => router.push(createNewsLink.route)} className="cursor-pointer">
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span>{createNewsLink.label}</span>
+                </DropdownMenuItem>
+                
+                {/* Analytics Option */}
+                <DropdownMenuItem onClick={() => router.push("/admin/stats")} className="cursor-pointer">
+                  <BarChart2 className="mr-2 h-4 w-4" />
+                  <span>Analytics</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Other Admin Links */}
+                {adminLinks.map(({ route, label }) => {
+                  // Skip Analytics since we already added it above
+                  if (label === "Analytics" || label === "Stats") return null;
+                  
+                  return (
+                    <DropdownMenuItem 
+                      key={label} 
+                      onClick={() => router.push(route)}
+                      className="cursor-pointer"
+                    >
+                      <div className="w-4 h-4 mr-2 flex-shrink-0 flex justify-center items-center">
+                        <svg viewBox="0 0 24 24" width="16" height="16" className="text-gray-700 dark:text-white-1 fill-current">
+                          <path d="M3 3H11V11H3V3ZM3 13H11V21H3V13ZM13 3H21V11H13V3ZM13 13H21V21H13V13Z" />
+                        </svg>
+                      </div>
+                      <span>{label}</span>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </Authenticated>
       </nav>

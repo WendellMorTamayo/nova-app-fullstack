@@ -1,50 +1,47 @@
 "use client";
 
 import EmptyState from "@/components/EmptyState";
-import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
 import { useQuery } from "convex/react";
-import React, { useEffect, useState, Suspense } from "react";
+import React, { Suspense } from "react";
 import RecentLoading from "./loading";
 
-// Content component with data loading
+// Content component with improved loading logic
 const RecentContent = () => {
   const { audio } = useAudio();
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  
+  // Fetch recents data
   const recents = useQuery(api.news.getRecents);
+  
+  // Process recent IDs only when data is available
   const recentNewsIds = recents
-    ?.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1))
-    .map((r) => r.news);
+    ? recents
+        .sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1))
+        .map((r) => r.news)
+    : [];
 
   // Only query if we have IDs
   const recentNews = useQuery(
     api.news.getNewsByMultipleIds,
-    recentNewsIds && recentNewsIds.length > 0
+    recentNewsIds.length > 0
       ? { newsIds: recentNewsIds }
       : "skip"
   );
 
-  useEffect(() => {
-    // Set a timeout to simulate loading for development purposes
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 1000);
+  // Determine loading states
+  const isRecentsLoading = recents === undefined;
+  const isNewsLoading = recentNewsIds.length > 0 && recentNews === undefined;
+  const isLoading = isRecentsLoading || isNewsLoading;
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  // If still in initial loading, don't render anything
-  // This forces Next.js to show the loading.tsx file
-  if (isInitialLoading) {
-    return RecentLoading();
+  // Show loading state when data is being fetched
+  if (isLoading) {
+    return <RecentLoading />;
   }
 
-  // Add safe checks to handle undefined data
-  const hasData = recentNews !== undefined;
-
+  // Render content based on data availability
   return (
     <section
       className={cn("flex flex-col mt-4 gap-4 h-[100vh-70px]", {
@@ -53,26 +50,9 @@ const RecentContent = () => {
     >
       <div className="flex flex-col gap-4">
         <h1 className="text-32 font-bold text-white-1">Recent</h1>
-        {!hasData ? (
-          <div className="border border-dashed border-gray-400 h-[400px] flex items-center justify-center">
-            <p className="text-white-2">Loading recent items...</p>
-          </div>
-        ) : recentNews?.length != undefined && recentNews.length > 0 ? (
-          <div className="podcast_grid">
-            {recentNews?.map(
-              ({ _id, newsTitle, newsDescription, imageUrl, views }) => (
-                <NewsCard
-                  key={_id}
-                  imgUrl={imageUrl || ""}
-                  title={newsTitle}
-                  description={newsDescription}
-                  newsId={_id}
-                  views={views}
-                />
-              )
-            )}
-          </div>
-        ) : (
+        
+        {recentNewsIds.length === 0 ? (
+          // No recent items found
           <div
             className={cn("border border-dashed border-gray-400 h-[750px]", {
               "h-[calc(100vh-300px)]": audio?.audioUrl,
@@ -84,14 +64,33 @@ const RecentContent = () => {
               buttonLink="/discover"
             />
           </div>
+        ) : recentNews && recentNews.length > 0 ? (
+          // Recent items found, display them
+          <div className="podcast_grid">
+            {recentNews.map((news) => (
+              <NewsCard
+                key={news._id}
+                imgUrl={news.imageUrl || ""}
+                title={news.newsTitle || ""}
+                description={news.newsDescription || ""}
+                newsId={news._id}
+                views={news.views || 0}
+              />
+            ))}
+          </div>
+        ) : (
+          // Fallback for any unexpected state
+          <div className="border border-dashed border-gray-400 h-[400px] flex items-center justify-center">
+            <p className="text-white-2">No recent items available</p>
+          </div>
         )}
       </div>
     </section>
   );
 };
 
+// Main component with Suspense boundary
 export default function Recent() {
-  // We need to use dynamic imports for components that use hooks like useSearchParams
   return (
     <Suspense fallback={<RecentLoading />}>
       <RecentContent />

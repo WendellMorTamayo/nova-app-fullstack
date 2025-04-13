@@ -9,23 +9,42 @@ import { useFormStatus } from "react-dom";
 
 export function AddToLikesButton({ newsId }: any) {
   const { pending } = useFormStatus();
-  const news = useQuery(api.news.getLikesByNewsId, { newsId: newsId });
+  const likesResponse = useQuery(api.news.getLikesByNewsId, { newsId: newsId });
   const addToLikes = useMutation(api.news.addToLikes);
   const removeFromLikes = useMutation(api.news.removeFromLikes);
   const [isLiked, setIsLiked] = useState(false);
   
-
   useEffect(() => {
-    setIsLiked(news?.length! > 0);
-  }, [news]);
+    // Handle different response formats
+    if (likesResponse) {
+      // New format (object with likes array and status)
+      if (likesResponse.likes) {
+        setIsLiked(likesResponse.likes.length > 0);
+      } 
+      // Legacy format (array)
+      else if (Array.isArray(likesResponse)) {
+        setIsLiked(likesResponse.length > 0);
+      }
+      // Default to not liked if format is unknown
+      else {
+        setIsLiked(false);
+      }
+    }
+  }, [likesResponse]);
 
   const handleClick = () => {
     if (!isLiked) {
       addToLikes({ newsId: newsId });
       setIsLiked(true);
     } else {
-      removeFromLikes({ newsId: news![0]._id });
-      setIsLiked(false);
+      // Handle both response formats
+      const likeId = likesResponse?.likes?.[0]?._id || 
+                    (Array.isArray(likesResponse) ? likesResponse[0]?._id : null);
+      
+      if (likeId) {
+        removeFromLikes({ newsId: likeId });
+        setIsLiked(false);
+      }
     }
   };
 

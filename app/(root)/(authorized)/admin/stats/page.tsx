@@ -167,10 +167,10 @@ export default function StatsPage() {
           {/* Tabs for different stat sections */}
           <Tabs defaultValue="users" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8">
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="content">Content</TabsTrigger>
-              <TabsTrigger value="revenue">Revenue</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="users">Users</TabsTrigger>
+              <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="content">Content</TabsTrigger>
+              <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="revenue">Revenue</TabsTrigger>
+              <TabsTrigger className="data-[state=active]:bg-primary data-[state=active]:text-white" value="performance">Performance</TabsTrigger>
             </TabsList>
             
             {/* Users Tab */}

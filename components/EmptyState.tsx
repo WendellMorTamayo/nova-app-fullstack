@@ -9,11 +9,12 @@ const EmptyState = ({
   search,
   buttonLink,
   buttonText,
+  description,
 }: EmptyStateProps) => {
   return (
     <section className="flex-center size-full flex-col gap-3">
       <Image src="/emptyState.svg" alt="emptyState" width={240} height={240} />
-      <div className="flex-center w-full max-w-[254px] flex-col gap-3">
+      <div className="flex-center w-full max-w-[300px] flex-col gap-3">
         <h1 className="text-18 text-center font-medium text-white-1">
           {title}
         </h1>
@@ -21,6 +22,11 @@ const EmptyState = ({
           <p className="text-16 text-cent font-medium text-white-2">
             Try adjusting you&apos;re search to find what you&apos;re looking
             for
+          </p>
+        )}
+        {description && (
+          <p className="text-16 text-center font-medium text-white-2">
+            {description}
           </p>
         )}
         {buttonLink && (

@@ -8,16 +8,24 @@ const FREE_CREDITS = 5;
 export const getUserById = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
-      .unique();
+    // Make this function safe - it will never throw an error
+    // If the user isn't found, it will simply return null
+    try {
+      const user = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("clerkId"), args.clerkId))
+        .first(); // Use first() instead of unique() to avoid errors
 
-    if (!user) {
-      throw new ConvexError("User not found");
+        // Return null instead of throwing an error when user is not found
+      if (!user) {
+        return null;
+      }
+
+      return user; // Return the user object directly, or null if not found
+    } catch (error) {
+      console.error("Error in getUserById:", error);
+      return null; // Return null on error
     }
-
-    return user;
   },
 });
 
@@ -71,23 +79,108 @@ export const createUser = internalMutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
-    // Check if this is the first user (to make them admin)
-    const existingUsers = await ctx.db.query("users").take(1);
-    const isFirstUser = existingUsers.length === 0;
-    
-    // Create user with admin privileges if they're the first user in the system
-    await ctx.db.insert("users", {
-      clerkId: args.clerkId,
-      email: args.email,
-      imageUrl: args.imageUrl,
-      name: args.name,
-      accountType: isFirstUser ? "admin" : "basic",
-      credits: FREE_CREDITS,
-    });
-    
-    // Log if first admin created
-    if (isFirstUser) {
-      console.log(`First user created with admin privileges: ${args.email}`);
+    try {
+      console.log(`Starting user creation for: ${args.email} (${args.clerkId})`);
+      
+      // Check if the user already exists
+      const existingUser = await ctx.db
+        .query("users")
+        .filter(q => q.eq(q.field("clerkId"), args.clerkId))
+        .first();
+        
+      if (existingUser) {
+        console.log(`User already exists with clerkId ${args.clerkId}, skipping creation`);
+        return { success: false, error: "User already exists" };
+      }
+      
+      // Check if this is the first user (to make them admin)
+      const existingUsers = await ctx.db.query("users").take(1);
+      const isFirstUser = existingUsers.length === 0;
+      
+      console.log(`Creating user in database with account type: ${isFirstUser ? "admin" : "basic"}`);
+      
+      // Create user with admin privileges if they're the first user in the system
+      const userId = await ctx.db.insert("users", {
+        clerkId: args.clerkId,
+        email: args.email,
+        imageUrl: args.imageUrl,
+        name: args.name,
+        accountType: isFirstUser ? "admin" : "basic",
+        credits: FREE_CREDITS,
+      });
+      
+      // Log if first admin created
+      if (isFirstUser) {
+        console.log(`First user created with admin privileges: ${args.email}`);
+      }
+      
+      console.log(`Successfully created user with ID: ${userId}`);
+      return { success: true, userId };
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return { success: false, error: String(error) };
+    }
+  },
+});
+
+// Manual user creation for debugging - allows direct creation from frontend
+export const manualCreateUser = mutation({
+  args: {
+    email: v.string(),
+    name: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    try {
+      // Get the authenticated user from Clerk
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) {
+        throw new ConvexError("Not authenticated");
+      }
+      
+      // Check if the user already exists
+      const existingUser = await ctx.db
+        .query("users")
+        .filter(q => q.eq(q.field("clerkId"), identity.subject))
+        .first();
+        
+      if (existingUser) {
+        console.log(`User already exists with clerkId ${identity.subject}`);
+        return { success: false, message: "User already exists in database" };
+      }
+      
+      // Check if this is the first user (to make them admin)
+      const existingUsers = await ctx.db.query("users").take(1);
+      const isFirstUser = existingUsers.length === 0;
+      
+      const name = args.name || identity.name || identity.email?.split('@')[0] || "User";
+      const imageUrl = identity.pictureUrl || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+      
+      console.log(`Manually creating user: ${name} (${identity.email})`);
+      
+      // Create user record
+      const userId = await ctx.db.insert("users", {
+        clerkId: identity.subject,
+        email: identity.email || args.email,
+        imageUrl: imageUrl,
+        name: name,
+        accountType: isFirstUser ? "admin" : "basic",
+        credits: FREE_CREDITS,
+      });
+      
+      console.log(`Successfully created user with ID: ${userId}`);
+      
+      return { 
+        success: true, 
+        message: "User created successfully",
+        userId,
+        isAdmin: isFirstUser 
+      };
+    } catch (error) {
+      console.error("Error in manual user creation:", error);
+      return { 
+        success: false, 
+        message: error instanceof Error ? error.message : String(error)
+      };
     }
   },
 });
@@ -279,12 +372,17 @@ export function getFullUser(ctx: QueryCtx | MutationCtx, userId: string) {
 export const getUser = query({
   args: {},
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    try {
+      const userId = await getUserId(ctx);
 
-    if (!userId) {
-      return undefined;
+      if (!userId) {
+        return null;
+      }
+
+      return getFullUser(ctx, userId);
+    } catch (error) {
+      console.error("Error in getUser:", error);
+      return null; // Return null if any error occurs
     }
-
-    return getFullUser(ctx, userId);
   },
 });

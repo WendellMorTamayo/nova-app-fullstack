@@ -9,6 +9,7 @@ export interface EmptyStateProps {
   search?: boolean;
   buttonText?: string;
   buttonLink?: string;
+  description?: string;
 }
 
 export interface TopUsersProps {

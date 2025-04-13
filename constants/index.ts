@@ -42,8 +42,8 @@ export const createNewsLink = {
 
 export const adminLinks = [
   {
-    route: "/admin/stats",
-    label: "Analytics",
+    route: "/admin",
+    label: "Dashboard",
     imgUrl: "/icons/chart.svg",
   },
 ];

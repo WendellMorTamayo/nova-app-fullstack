@@ -6,6 +6,8 @@ import NewsCard from "@/components/NewsCard";
 import { api } from "@/convex/_generated/api";
 import ProfileCard from "@/components/ProfileCard";
 import ProfileLoading from "./loading";
+import CreateUserButton from "@/components/CreateUserButton";
+import { useUser } from "@clerk/nextjs";
 
 // Profile content component with improved loading logic
 function ProfileContent({
@@ -31,6 +33,36 @@ function ProfileContent({
   // If data is still loading, show the loading component
   if (isLoading) {
     return <ProfileLoading />;
+  }
+
+  // Get Clerk user data
+  const { user: clerkUser, isSignedIn } = useUser();
+  
+  // If the user wasn't found (null was returned), show a not found state
+  if (user === null) {
+    // Check if this is the current user trying to view their own profile
+    const isCurrentUser = isSignedIn && clerkUser?.id === profileId;
+    
+    return (
+      <section className="mt-9 flex flex-col items-center justify-center gap-4">
+        <EmptyState
+          title={isCurrentUser ? "Complete Your Registration" : "User not found"}
+          description={
+            isCurrentUser 
+              ? "Your user profile hasn't been created in our database. Click the button below to fix this."
+              : "The user you're looking for doesn't exist or has been deleted."
+          }
+          buttonLink={!isCurrentUser ? "/" : undefined}
+          buttonText={!isCurrentUser ? "Go Home" : undefined}
+        />
+        
+        {isCurrentUser && (
+          <div className="mt-4">
+            <CreateUserButton />
+          </div>
+        )}
+      </section>
+    );
   }
 
   // Transform the data to match the expected types

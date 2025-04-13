@@ -1,10 +1,8 @@
-const authConfig = {
+export default {
   providers: [
     {
-      domain: "https://touching-baboon-23.clerk.accounts.dev",
-      applicationID: "convex",
+      domain: 'https://delicate-longhorn-6.clerk.accounts.dev/',
+      applicationID: 'convex',
     },
   ],
-};
-
-export default authConfig;
+}

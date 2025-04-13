@@ -6,7 +6,7 @@ import RightSidebar from "@/components/RightSidebar";
 import { Toaster } from "@/components/ui/toaster";
 import NewsPlayer from "@/components/NewsPlayer";
 import { usePathname } from "next/navigation";
-import Searchbar from "@/components/SearchBar";
+import SearchBarWithSuspense from "@/components/SearchBarWithSuspense";
 import { AnimatedLogo } from "@/components/magicui/animated-logo";
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
               <MobileNav />
             </div>
             <div className="flex flex-col md:pb-14">
-              {!isCreationActive && !isNewsActive && !isSubscriptionPage && !isAdminPage && <Searchbar />}
+              {!isCreationActive && !isNewsActive && !isSubscriptionPage && !isAdminPage && <SearchBarWithSuspense />}
               <Toaster />
               {/* Let Next.js handle loading states with standard app router patterns */}
               {children}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useIsSubscribed } from "@/hooks/useIsSubscribed";
 
-export default function PaymentSuccess() {
+// PaymentSuccessContent component that uses useSearchParams
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -99,5 +100,35 @@ export default function PaymentSuccess() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Loading fallback component
+function PaymentLoadingFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <div className="flex justify-center mb-4">
+            <Loader2 className="w-16 h-16 text-purple-500 animate-spin" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-center">
+            Loading Payment Details...
+          </CardTitle>
+          <CardDescription className="text-center">
+            Please wait while we load your subscription information
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </div>
+  );
+}
+
+// Main component with Suspense boundary
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={<PaymentLoadingFallback />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

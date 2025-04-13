@@ -3,7 +3,6 @@
 import EmptyState from "@/components/EmptyState";
 import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
-import Searchbar from "@/components/SearchBar";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
@@ -91,13 +90,11 @@ const RecentContent = () => {
   );
 };
 
-// Main page component with Suspense boundary
-const Recent = () => {
+export default function Recent() {
+  // We need to use dynamic imports for components that use hooks like useSearchParams
   return (
     <Suspense fallback={<RecentLoading />}>
       <RecentContent />
     </Suspense>
   );
-};
-
-export default Recent;
+}

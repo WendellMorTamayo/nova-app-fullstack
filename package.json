@@ -36,6 +36,7 @@
     "embla-carousel-react": "^8.1.8",
     "framer-motion": "^11.18.2",
     "fs": "^0.0.1-security",
+    "glob": "^11.0.1",
     "lucide-react": "^0.414.0",
     "next": "^14.2.15",
     "next-themes": "^0.3.0",
@@ -43,6 +44,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
+    "rimraf": "^6.0.1",
     "stripe": "^16.8.0",
     "svix": "^1.28.0",
     "tailwind-merge": "^2.5.2",
@@ -60,5 +62,9 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.10",
     "typescript": "^5"
+  },
+  "overrides": {
+    "rimraf": "^6.0.1",
+    "glob": "^11.0.1"
   }
 }

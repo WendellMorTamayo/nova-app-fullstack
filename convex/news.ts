@@ -493,12 +493,13 @@ export const removeFromLikes = mutation({
 export const getLikesByNewsId = query({
   args: { newsId: v.optional(v.id("news")) },
   handler: async (ctx, args) => {
+    // Return empty array for all error cases instead of throwing
     try {
       const { newsId } = args;
       
       // Handle case when newsId is not provided
       if (!newsId) {
-        return [];
+        return { likes: [], status: "no_id" };
       }
       
       // Safely get user identity
@@ -507,12 +508,12 @@ export const getLikesByNewsId = query({
         identity = await ctx.auth.getUserIdentity();
       } catch (e) {
         // If there's any authentication error, return empty array
-        return [];
+        return { likes: [], status: "auth_error" };
       }
       
       // If user is not authenticated, return empty array
       if (!identity || !identity.email) {
-        return [];
+        return { likes: [], status: "not_authenticated" };
       }
 
       // Find user by email - with extra error handling
@@ -524,12 +525,12 @@ export const getLikesByNewsId = query({
           .first();
       } catch (e) {
         // If query fails, return empty array
-        return [];
+        return { likes: [], status: "user_query_error" };
       }
 
-      // If user not found, return empty array
+      // If user not found, return empty array instead of throwing error
       if (!user) {
-        return [];
+        return { likes: [], status: "user_not_found" };
       }
 
       // Get likes for this user and newsId
@@ -542,14 +543,14 @@ export const getLikesByNewsId = query({
           .collect();
       } catch (e) {
         // If query fails, return empty array
-        return [];
+        return { likes: [], status: "likes_query_error" };
       }
       
-      return likes;
+      return { likes, status: "success" };
     } catch (error) {
       // Catch any other unexpected errors and return empty array
       console.error("Error in getLikesByNewsId:", error);
-      return [];
+      return { likes: [], status: "unknown_error" };
     }
   },
 });

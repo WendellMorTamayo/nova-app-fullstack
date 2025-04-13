@@ -3,5 +3,10 @@ import { useQuery } from "convex/react";
 
 export function useIsSubscribed() {
   const user = useQuery(api.users.getUser);
-  return user && (user.endsOn ?? 0) > Date.now();
+  
+  // Handle all possible edge cases
+  if (!user) return false;
+  if (user.endsOn === undefined || user.endsOn === null) return false;
+  
+  return user.endsOn > Date.now();
 }

@@ -19,11 +19,20 @@ export default defineSchema({
     voiceType: v.string(),
     audioDuration: v.number(),
     views: v.number(),
+    trending_score: v.optional(v.number()),
+    last_updated: v.optional(v.number()),
+    source: v.optional(v.string()), // Source of the news (e.g., CNN, BBC)
   })
     .searchIndex("search_author", { searchField: "author" })
-    .searchIndex("search_title", { searchField: "newsTitle" })
     .searchIndex("search_body", { searchField: "newsDescription" })
-    .searchIndex("search_type", { searchField: "newsType" }),
+    .searchIndex("search_type", { searchField: "newsType" })
+    // Combined search index that includes the title and additional fields
+    .searchIndex("search_full", {
+      searchField: "newsTitle",
+      additionalFields: ["newsDescription", "author", "newsType"]
+    })
+    .index("by_trending", ["trending_score"])
+    .index("by_views", ["views"]),
 
   users: defineTable({
     email: v.string(),

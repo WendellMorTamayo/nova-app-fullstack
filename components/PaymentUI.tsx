@@ -41,7 +41,9 @@ export function PaymentUI() {
         return;
       }
       
-      window.location.href = result;
+      if (typeof result === 'string') {
+        window.location.href = result;
+      }
     } catch (err) {
       const errorMessage = (err as Error).message || "Something went wrong";
       setError(errorMessage);
@@ -57,10 +59,12 @@ export function PaymentUI() {
 
   return (
     <div className="w-full">
-      <div className="relative">
+      {/* First wrapper with padding to make room for the badge */}
+      <div className="relative mt-6 mx-2">
+        {/* Badge positioned at the edge of the component with rotation */}
         {!isSubscribed && (
-          <div className="absolute -top-2 -right-2 rotate-12 z-10">
-            <Badge className="bg-red-500 text-white font-bold px-2 py-1 text-xs">
+          <div className="absolute -top-3 -right-3 rotate-12" style={{ zIndex: 50 }}>
+            <Badge className="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-1.5 text-sm shadow-xl border-2 border-red-400">
               BEST VALUE
             </Badge>
           </div>

@@ -98,10 +98,14 @@ export const fulfill = internalAction({
           completedEvent.subscription as string
         );
 
-        await ctx.runMutation(internal.users.updateSubscriptionBySubId, {
-          subscriptionId: subscription.items.data[0]?.price.id,
-          endsOn: subscription.current_period_end * 1000,
-        });
+        if (subscription && subscription.items.data.length > 0) {
+          await ctx.runMutation(internal.users.updateSubscriptionBySubId, {
+            subscriptionId: subscription.id, // Use subscription ID instead of price ID
+            endsOn: subscription.current_period_end * 1000,
+          });
+        } else {
+          console.error("Invalid subscription data received");
+        }
       }
 
       return { success: true };

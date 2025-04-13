@@ -12,7 +12,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearch } from "@/providers/SearchProvider";
 
 interface FilterButtonProps {
   onFilterChange: (selectedCategories: string[]) => void;
@@ -20,10 +21,15 @@ interface FilterButtonProps {
 
 export function FilterButton({ onFilterChange }: FilterButtonProps) {
   const categories = ["sports", "entertainment", "technology", "business"];
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [tempSelectedCategories, setTempSelectedCategories] = useState<
-    string[]
-  >([]);
+  const { filters } = useSearch();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(filters);
+  const [tempSelectedCategories, setTempSelectedCategories] = useState<string[]>(filters);
+  
+  // Update local state when context changes (e.g., when switching tabs)
+  useEffect(() => {
+    setSelectedCategories(filters);
+    setTempSelectedCategories(filters);
+  }, [filters]);
 
   const handleCheckboxChange = (category: string) => {
     setTempSelectedCategories((prev) => {
@@ -46,7 +52,7 @@ export function FilterButton({ onFilterChange }: FilterButtonProps) {
           <span>Filter</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="bg-black-2 border-0 p-6">
+      <SheetContent className="bg-gray-100 dark:bg-black-2 border-0 p-6">
         <SheetHeader>
           <SheetTitle>Edit Filter</SheetTitle>
           <SheetDescription>Add desired filters</SheetDescription>

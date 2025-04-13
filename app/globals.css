@@ -9,7 +9,24 @@
 }
 
 html {
+  background-color: #f8f9fa;
+  color: #222;
+}
+
+html.dark {
   background-color: #101114;
+  color: #fff;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
 }
 
 @layer base {
@@ -71,22 +88,22 @@ html {
 
 @layer utilities {
   .input-class {
-    @apply text-16 placeholder:text-16 bg-black-1 rounded-[6px] placeholder:text-gray-1 border-none text-gray-1;
+    @apply text-16 placeholder:text-16 bg-gray-100 dark:bg-black-1 rounded-[6px] placeholder:text-gray-1 border-none text-gray-800 dark:text-gray-1;
   }
   .podcast_grid {
     @apply grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5;
   }
   .right_sidebar {
-    @apply sticky right-0 top-0 flex w-[310px] flex-col overflow-y-hidden border-none bg-black-1 px-[30px] pt-8 max-xl:hidden;
+    @apply sticky right-0 top-0 flex w-[310px] flex-col overflow-y-hidden border-none px-[30px] pt-8 max-xl:hidden dark:bg-black-1 bg-gray-100;
   }
   .left_sidebar {
-    @apply sticky left-0 top-0 flex w-fit flex-col  justify-between  border-none  bg-black-1 pt-8 text-white-1 max-md:hidden lg:w-[270px] lg:pl-8;
+    @apply sticky left-0 top-0 flex w-fit flex-col justify-between border-none pt-8 max-md:hidden lg:w-[270px] lg:pl-8 dark:bg-black-1 dark:text-white-1 bg-gray-100 text-black-1;
   }
   .generate_thumbnail {
-    @apply mt-[30px] flex w-full max-w-[520px] flex-col justify-between gap-2 rounded-lg border border-black-6 bg-black-1 px-2.5 py-2 md:flex-row md:gap-0;
+    @apply mt-[30px] flex w-full max-w-[520px] flex-col justify-between gap-2 rounded-lg border border-gray-300 dark:border-black-6 bg-gray-100 dark:bg-black-1 px-2.5 py-2 md:flex-row md:gap-0;
   }
   .image_div {
-    @apply flex-center mt-5 h-[142px] w-full cursor-pointer flex-col gap-3 rounded-xl border-[3.2px] border-dashed border-black-6 bg-black-1;
+    @apply flex-center mt-5 h-[142px] w-full cursor-pointer flex-col gap-3 rounded-xl border-[3.2px] border-dashed border-gray-300 dark:border-black-6 bg-gray-100 dark:bg-black-1;
   }
   .carousel_box {
     @apply relative flex h-fit aspect-square w-full flex-none cursor-pointer flex-col justify-end rounded-xl border-none;
@@ -129,10 +146,19 @@ html {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
+  background: #f0f2f5;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
   background: #15171c;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c6cd;
+  border-radius: 50px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #222429;
   border-radius: 50px;
 }
@@ -161,6 +187,12 @@ html {
   -webkit-backdrop-filter: blur(4px);
 }
 .glassmorphism-black {
+  background: rgba(240, 240, 245, 0.8);
+  backdrop-filter: blur(37px);
+  -webkit-backdrop-filter: blur(37px);
+}
+
+.dark .glassmorphism-black {
   background: rgba(18, 18, 18, 0.64);
   backdrop-filter: blur(37px);
   -webkit-backdrop-filter: blur(37px);

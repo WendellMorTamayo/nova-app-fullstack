@@ -68,20 +68,39 @@ http.route({
 const validateRequest = async (
   req: Request
 ): Promise<WebhookEvent | undefined> => {
-  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET!;
+  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    throw new Error("CLERK_WEBHOOK_SECRET is not defined");
+    console.error("CLERK_WEBHOOK_SECRET is not defined");
+    return undefined;
   }
-  const payloadString = await req.text();
-  const headerPayload = req.headers;
-  const svixHeaders = {
-    "svix-id": headerPayload.get("svix-id")!,
-    "svix-timestamp": headerPayload.get("svix-timestamp")!,
-    "svix-signature": headerPayload.get("svix-signature")!,
-  };
-  const wh = new Webhook(webhookSecret);
-  const event = wh.verify(payloadString, svixHeaders);
-  return event as unknown as WebhookEvent;
+  
+  try {
+    const payloadString = await req.text();
+    const headerPayload = req.headers;
+    
+    // Check for required Svix headers
+    const svixId = headerPayload.get("svix-id");
+    const svixTimestamp = headerPayload.get("svix-timestamp");
+    const svixSignature = headerPayload.get("svix-signature");
+    
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      console.error("Missing svix headers");
+      return undefined;
+    }
+    
+    const svixHeaders = {
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature,
+    };
+    
+    const wh = new Webhook(webhookSecret);
+    const event = wh.verify(payloadString, svixHeaders);
+    return event as unknown as WebhookEvent;
+  } catch (error) {
+    console.error("Error validating webhook:", error);
+    return undefined;
+  }
 };
 
 export default http;

@@ -97,7 +97,7 @@ const GenerateNews = (props: GenerateNewsProps) => {
   return (
     <div>
       <div className="flex flex-col gap-2.5">
-        <Label className="text-16 font-bold text-white-1">
+        <Label className="text-16 font-bold dark:text-white-1 text-black-1">
           AI Prompt to Generate Podcast
         </Label>
         <Textarea
@@ -110,29 +110,44 @@ const GenerateNews = (props: GenerateNewsProps) => {
       </div>
       <div className="mt-5 w-full max-w-[200px]">
         <Button
-          className="text-16 bg-purple-1 py-4 font-bold text-white-1"
+          className={`text-16 bg-purple-1 py-4 font-bold text-white-1 relative ${isGenerating ? 'opacity-90' : ''}`}
           onClick={generateNews}
+          disabled={isGenerating}
         >
           {isGenerating ? (
-            <>
-              Generating
-              <Loader size={20} className="animate-spin mr-2" />
-            </>
+            <div className="flex items-center justify-center gap-2">
+              <Loader size={20} className="animate-spin" />
+              <span>Generating...</span>
+            </div>
           ) : (
             "Generate"
           )}
         </Button>
       </div>
+      
+      {isGenerating && (
+        <div className="mt-6 p-3 rounded-md bg-black-2 dark:bg-black-2 bg-opacity-25 text-sm flex flex-col gap-2 animate-pulse">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <p className="text-gray-400">AI is generating your news content...</p>
+          </div>
+          <p className="text-xs text-gray-500">This may take up to 30 seconds</p>
+        </div>
+      )}
+      
       {props.audio && (
-        <audio
-          controls
-          src={props.audio}
-          autoPlay
-          className="mt-5"
-          onLoadedMetadata={(e) =>
-            props.setAudioDuration(e.currentTarget.duration)
-          }
-        />
+        <div className="mt-5 animate-in fade-in-50 duration-300">
+          <audio
+            controls
+            src={props.audio}
+            autoPlay
+            className="w-full"
+            onLoadedMetadata={(e) =>
+              props.setAudioDuration(e.currentTarget.duration)
+            }
+          />
+          <p className="text-xs text-gray-400 mt-1">Audio generated successfully</p>
+        </div>
       )}
     </div>
   );

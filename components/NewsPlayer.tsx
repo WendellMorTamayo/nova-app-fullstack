@@ -84,12 +84,15 @@ const NewsPlayer = () => {
       if (audioElement) {
         audioElement.play().then(() => {
           setIsPlaying(true);
+        }).catch(error => {
+          console.error("Error playing audio:", error);
+          setIsPlaying(false);
         });
       }
       setNewsId(audio?.newsId);
     } else {
       audioElement?.pause();
-      setIsPlaying(true);
+      setIsPlaying(false);
     }
   }, [audio]);
   const handleLoadedMetadata = () => {
@@ -124,7 +127,7 @@ const NewsPlayer = () => {
         
         {/* Mobile view: simplified layout */}
         <div className="flex items-center gap-2 sm:hidden w-full mb-2">
-          <Link href={`/podcast/${audio?.newsId}`}>
+          <Link href={`/news/${audio?.newsId}`}>
             <Image
               src={audio?.imageUrl! || "/step-forward 2.svg"}
               width={40}
@@ -138,13 +141,18 @@ const NewsPlayer = () => {
               {audio?.title}
             </h2>
             <p className="text-xs font-normal text-white-2">{audio?.author}</p>
+            {audio?.source && (
+              <p className="text-9 font-normal text-gray-400">
+                Source: {audio.source}
+              </p>
+            )}
           </div>
           {!isOwner ? <AddToLikesButton key={newsId} newsId={newsId} /> : null}
         </div>
         
         {/* Desktop view: original layout */}
         <div className="hidden sm:flex items-center gap-4">
-          <Link href={`/podcast/${audio?.newsId}`}>
+          <Link href={`/news/${audio?.newsId}`}>
             <Image
               src={audio?.imageUrl! || "/step-forward 2.svg"}
               width={64}
@@ -158,6 +166,11 @@ const NewsPlayer = () => {
               {audio?.title}
             </h2>
             <p className="text-12 font-normal text-white-2">{audio?.author}</p>
+            {audio?.source && (
+              <p className="text-10 font-normal text-gray-400">
+                Source: {audio.source}
+              </p>
+            )}
           </div>
         </div>
         

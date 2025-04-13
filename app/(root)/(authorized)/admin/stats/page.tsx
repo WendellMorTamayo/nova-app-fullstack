@@ -14,35 +14,87 @@ import {
   Loader2,
   SparklesIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Spotlight } from "@/components/magicui/spotlight";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 import TypingAnimation from "@/components/magicui/typing-animation";
+import Link from "next/link";
 
 export default function StatsPage() {
-  // We'll mock the data now and replace with real queries later
-  const [isLoading, setIsLoading] = useState(false);
+  // Fetch real data from admin query
+  const statsData = useQuery(api.admin.getStats);
+  const recentContent = useQuery(api.admin.getRecentContent, { limit: 10 });
   
-  // Mock data - would come from backend
-  const dashboardStats = {
+  // Check if the current user is an admin
+  const userData = useQuery(api.users.getUser);
+  const isAdmin = userData?.accountType === "admin";
+  
+  // Track if initial user data check is complete
+  const [initialCheckComplete, setInitialCheckComplete] = useState(false);
+  
+  // Set initial check complete after user data is loaded
+  useEffect(() => {
+    if (userData !== undefined) {
+      // Delay the check slightly to prevent flash
+      const timer = setTimeout(() => {
+        setInitialCheckComplete(true);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userData]);
+  
+  // Determine if we're in loading state
+  const isLoading = !statsData || !recentContent || !initialCheckComplete;
+  
+  // Use real data from backend if available, otherwise show placeholder
+  const dashboardStats = statsData || {
     users: {
-      total: 1250,
-      newLastMonth: 128,
-      premium: 175,
-      conversionRate: "14.00"
+      total: 0,
+      newLastMonth: 0,
+      premium: 0,
+      conversionRate: "0.00"
     },
     content: {
-      totalNews: 450,
-      newLastMonth: 58,
-      avgViewsPerNews: "85.5",
-      totalViews: 38475
+      totalNews: 0,
+      newLastMonth: 0,
+      avgViewsPerNews: "0.0",
+      totalViews: 0
     },
     financial: {
-      mrr: 700,
-      estimatedAnnualRevenue: 8400
+      mrr: 0,
+      estimatedAnnualRevenue: 0
     }
   };
   
+  // Loading state - show a loading indicator instead of flashing unauthorized message
+  if (!initialCheckComplete) {
+    return (
+      <div className="container mx-auto py-20 px-4 flex flex-col items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-12 w-12 animate-spin text-purple-500 mb-4" />
+        <p className="text-lg text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+      </div>
+    );
+  }
+  
+  // If user is not an admin, show unauthorized message
+  if (!isAdmin) {
+    return (
+      <div className="container mx-auto py-20 px-4 flex flex-col items-center justify-center min-h-[50vh]">
+        <h1 className="text-3xl font-bold text-red-500 mb-4">Unauthorized Access</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+          You don&apos;t have permission to view this page. Only administrators can access analytics.
+        </p>
+        <Link href="/" className="text-purple-500 hover:text-purple-600 flex items-center gap-2">
+          <span>Return to Home</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12H21M3 12L9 18M3 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="text-center mb-12 relative">
@@ -73,7 +125,7 @@ export default function StatsPage() {
               <StatsCard 
                 title="Total Users"
                 value={dashboardStats.users.total.toString()}
-                description={`+${dashboardStats.users.newLastMonth} this month`}
+                description={`+${dashboardStats.users.total} this month`}
                 icon={<Users className="h-5 w-5" />}
                 trend="up"
               />
@@ -177,10 +229,55 @@ export default function StatsPage() {
                     Total content metrics
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="h-[300px] flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    Content metrics will be displayed here
-                  </p>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="p-4 bg-card/50 rounded-lg border">
+                      <h3 className="text-sm font-medium mb-1">Total Content</h3>
+                      <p className="text-2xl font-bold">{dashboardStats.content.totalNews}</p>
+                    </div>
+                    <div className="p-4 bg-card/50 rounded-lg border">
+                      <h3 className="text-sm font-medium mb-1">Total Views</h3>
+                      <p className="text-2xl font-bold">{dashboardStats.content.totalViews.toLocaleString()}</p>
+                    </div>
+                    <div className="p-4 bg-card/50 rounded-lg border">
+                      <h3 className="text-sm font-medium mb-1">Avg. Views</h3>
+                      <p className="text-2xl font-bold">{dashboardStats.content.avgViewsPerNews}</p>
+                    </div>
+                  </div>
+                  
+                  <h3 className="font-medium mb-4">Recent Content</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-4 font-medium">Title</th>
+                          <th className="text-left py-2 px-4 font-medium">Created</th>
+                          <th className="text-right py-2 px-4 font-medium">Views</th>
+                          <th className="text-right py-2 px-4 font-medium">Trending Score</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentContent && recentContent.length > 0 ? (
+                          recentContent.map((item) => (
+                            <tr key={item._id} className="border-b hover:bg-card/60">
+                              <td className="py-2 px-4 text-sm truncate max-w-[250px]">{item.newsTitle}</td>
+                              <td className="py-2 px-4 text-sm">
+                                {new Date(item.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="py-2 px-4 text-sm text-right">{item.views}</td>
+                              <td className="py-2 px-4 text-sm text-right">{item.trending_score.toFixed(2)}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={4} className="py-4 text-center text-muted-foreground">
+                              {isLoading ? "Loading..." : "No content available"}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

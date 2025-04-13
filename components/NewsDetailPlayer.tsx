@@ -24,6 +24,7 @@ const NewsDetailPlayer = ({
   authorImageUrl,
   authorId,
   voiceType,
+  source,
 }: newsDetailPlayerProps) => {
   const router = useRouter();
   const { setAudio } = useAudio();
@@ -54,6 +55,7 @@ const NewsDetailPlayer = ({
       imageUrl,
       author,
       newsId,
+      source,
     });
     console.log(audioUrl);
   };
@@ -75,6 +77,11 @@ const NewsDetailPlayer = ({
             <h1 className="text-32 font-extrabold tracking-[-0.32px] text-white-1">
               {newsTitle}
             </h1>
+            {source && (
+              <p className="text-14 font-medium text-gray-400">
+                Source: {source}
+              </p>
+            )}
             <figure
               className="flex cursor-pointer items-center gap-2"
               onClick={() => {

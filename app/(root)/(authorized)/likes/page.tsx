@@ -8,17 +8,34 @@ import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
 import { useQuery } from "convex/react";
 import React from "react";
+import LikesLoading from "./loading";
 
 const Likes = () => {
   const { audio } = useAudio();
+  
+  // Get liked items IDs
   const likes = useQuery(api.news.getLikes);
   const likesIds = likes?.map((r) => r.news);
+  
+  // Only query if we have IDs
+  const likedNews = useQuery(
+    api.news.getNewsByMultipleIds, 
+    likesIds && likesIds.length > 0 
+      ? { newsIds: likesIds } 
+      : "skip"
+  );
 
-  const likedNews = useQuery(api.news.getNewsByMultipleIds, {
-    newsIds: likesIds!,
-  });
+  // Determine loading states more efficiently
+  const isLikesLoading = likes === undefined;
+  const isNewsLoading = likesIds && likesIds.length > 0 && likedNews === undefined;
+  const isLoading = isLikesLoading || isNewsLoading;
 
-  if (!likedNews) return <LoaderSpinner />;
+  // If any data is still loading, show the loading component
+  if (isLoading) {
+    return <LikesLoading />;
+  }
+
+  // Render content based on data availability
   return (
     <section
       className={cn("flex flex-col mt-4 gap-4 h-[100vh-70px]", {
@@ -27,32 +44,33 @@ const Likes = () => {
     >
       <div className="flex flex-col gap-4">
         <h1 className="text-32 font-bold text-white-1">Likes</h1>
-        {likedNews?.length != undefined && likedNews.length > 0 ? (
-          <div className="podcast_grid">
-            {likedNews?.map(
-              ({ _id, newsTitle, newsDescription, imageUrl, views }: any) => (
-                <NewsCard
-                  key={_id}
-                  imgUrl={imageUrl!}
-                  title={newsTitle}
-                  description={newsDescription}
-                  newsId={_id}
-                  views={views}
-                />
-              )
-            )}
-          </div>
-        ) : (
+        
+        {/* No likes found - show empty state */}
+        {!likesIds?.length ? (
           <div
             className={cn("border border-dashed border-gray-400 h-[750px]", {
               "h-[calc(100vh-300px)]": audio?.audioUrl,
             })}
           >
             <EmptyState
-              title="You have not watched any news yet"
+              title="You have not liked any news yet"
               buttonText="Discover"
               buttonLink="/discover"
             />
+          </div>
+        ) : (
+          /* Render liked news items */
+          <div className="podcast_grid">
+            {likedNews?.map((news) => (
+              <NewsCard
+                key={news._id}
+                imgUrl={news.imageUrl || ""}
+                title={news.newsTitle}
+                description={news.newsDescription}
+                newsId={news._id}
+                views={news.views}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -43,6 +43,7 @@ export interface NewsProps {
   voiceType: string;
   audioDuration: number;
   views: number;
+  source?: string;
 }
 
 export interface ProfileNewsProps {
@@ -93,6 +94,7 @@ export interface newsDetailPlayerProps {
   authorImageUrl: string;
   authorId: string;
   voiceType: string;
+  source?: string;
 }
 
 export interface AudioProps {
@@ -101,6 +103,7 @@ export interface AudioProps {
   author: string;
   imageUrl: string;
   newsId: Id<"news">;
+  source?: string;
 }
 
 export interface AudioContextType {
@@ -113,7 +116,8 @@ export interface newsCardProps {
   title: string;
   description: string;
   newsId: Id<"news">;
-  views: number;
+  views?: number; // Make views optional
+  source?: string;
 }
 
 export interface CarouselProps {

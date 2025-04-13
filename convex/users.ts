@@ -71,14 +71,24 @@ export const createUser = internalMutation({
     name: v.string(),
   },
   handler: async (ctx, args) => {
+    // Check if this is the first user (to make them admin)
+    const existingUsers = await ctx.db.query("users").take(1);
+    const isFirstUser = existingUsers.length === 0;
+    
+    // Create user with admin privileges if they're the first user in the system
     await ctx.db.insert("users", {
       clerkId: args.clerkId,
       email: args.email,
       imageUrl: args.imageUrl,
       name: args.name,
-      accountType: "basic",
+      accountType: isFirstUser ? "admin" : "basic",
       credits: FREE_CREDITS,
     });
+    
+    // Log if first admin created
+    if (isFirstUser) {
+      console.log(`First user created with admin privileges: ${args.email}`);
+    }
   },
 });
 
@@ -134,8 +144,9 @@ export const deleteUser = internalMutation({
   },
 });
 
-export const updateAccounType = mutation({
-  handler: async (ctx) => {
+export const updateAccountType = mutation({
+  args: { accountType: v.string() },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError("NotAuthenticated");
@@ -144,11 +155,73 @@ export const updateAccounType = mutation({
     const user = await ctx.db
       .query("users")
       .filter((q) => q.eq(q.field("email"), identity.email))
-      .collect();
+      .first();
 
-    if (user.length == 0) {
-      throw new ConvexError("user not found");
+    if (!user) {
+      throw new ConvexError("User not found");
     }
+
+    // Validate account type
+    if (!["basic", "premium", "admin"].includes(args.accountType)) {
+      throw new ConvexError("Invalid account type. Must be basic, premium, or admin");
+    }
+
+    // Update the account type
+    await ctx.db.patch(user._id, {
+      accountType: args.accountType
+    });
+
+    return { success: true };
+  },
+});
+
+// Admin mutation to update any user's account type (requires admin privileges)
+export const promoteUserToAdmin = mutation({
+  args: { 
+    userId: v.string(),
+    accountType: v.string() 
+  },
+  handler: async (ctx, args) => {
+    // Check if the current user is an admin
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("NotAuthenticated");
+    }
+    
+    // Get the current user to check if they're an admin
+    const currentUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .first();
+      
+    if (!currentUser || currentUser.accountType !== "admin") {
+      throw new ConvexError("Unauthorized: Only admins can promote users");
+    }
+    
+    // Get the target user
+    const targetUser = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("clerkId"), args.userId))
+      .first();
+      
+    if (!targetUser) {
+      throw new ConvexError("Target user not found");
+    }
+    
+    // Validate account type
+    if (!["basic", "premium", "admin"].includes(args.accountType)) {
+      throw new ConvexError("Invalid account type. Must be basic, premium, or admin");
+    }
+    
+    // Update the account type
+    await ctx.db.patch(targetUser._id, {
+      accountType: args.accountType
+    });
+    
+    return { 
+      success: true,
+      message: `User ${targetUser.name} has been updated to ${args.accountType}`
+    };
   },
 });
 
@@ -161,10 +234,14 @@ export const updateSubscription = internalMutation({
       throw new Error("no user found with that user id");
     }
 
+    // Update the user with subscription details AND set accountType to premium
     await ctx.db.patch(user._id, {
       subscriptionId: args.subscriptionId,
       endsOn: args.endsOn,
+      accountType: "premium", // Set the account type to premium when subscribing
     });
+    
+    console.log(`User ${user.name} (${args.userId}) subscription updated: ${args.subscriptionId}, expires: ${new Date(args.endsOn).toISOString()}`);
   },
 });
 
@@ -179,12 +256,16 @@ export const updateSubscriptionBySubId = internalMutation({
       .first();
 
     if (!user) {
-      throw new Error("no user found with that user id");
+      throw new Error("no user found with that subscription id");
     }
 
+    // Update the subscription end date and ensure accountType is premium
     await ctx.db.patch(user._id, {
       endsOn: args.endsOn,
+      accountType: "premium", // Ensure account type is set to premium on renewal
     });
+    
+    console.log(`User ${user.name} subscription renewed: ${args.subscriptionId}, new expiry: ${new Date(args.endsOn).toISOString()}`);
   },
 });
 

@@ -3,12 +3,12 @@
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import Image from "next/image";
-import React from "react";
+import React, { Suspense } from "react";
 import { Id } from "@/convex/_generated/dataModel";
 import NewsDetailPlayer from "@/components/NewsDetailPlayer";
-import LoaderSpinner from "@/components/LoaderSpinner";
 import NewsCard from "@/components/NewsCard";
 import EmptyState from "@/components/EmptyState";
+import { NewsDetailSkeleton } from "@/components/NewsDetailSkeleton";
 
 const NewsDetails = ({
   params: { newsId },
@@ -18,9 +18,12 @@ const NewsDetails = ({
   const news = useQuery(api.news.getNewsById, { newsId: newsId });
   const similarNews = useQuery(api.news.getNewsByNewsType, { newsId });
 
-  if (!similarNews || !news) {
-    return <LoaderSpinner />;
+  // Add safe checks to handle undefined data
+  const hasData = news !== undefined && similarNews !== undefined;
+  if (!hasData) {
+    return <NewsDetailSkeleton />;
   }
+
   return (
     <section className="flex w-full flex-col">
       <header className="mt-9 flex items-center justify-between">
@@ -59,13 +62,15 @@ const NewsDetails = ({
         {similarNews && similarNews.length > 0 ? (
           <div className="podcast_grid">
             {similarNews?.map(
-              ({ _id, newsTitle, newsDescription, imageUrl }) => (
+              ({ _id, newsTitle, newsDescription, imageUrl, source }) => (
                 <NewsCard
                   key={_id}
                   imgUrl={imageUrl!}
                   title={newsTitle}
                   description={newsDescription}
                   newsId={_id}
+                  views={0}
+                  source={source}
                 />
               )
             )}

@@ -108,12 +108,12 @@ const GenerateThumbnail = ({
       {isAiThumbnail ? (
         <div className="flex flex-col gap-5">
           <div className="mt-5 flex flex-col gap-2.5">
-            <Label className="text-16 font-bold text-white-1">
-              AI Prompt to Generate Podcast
+            <Label className="text-16 font-bold dark:text-white-1 text-black-1">
+              AI Prompt to Generate Thumbnail
             </Label>
             <Textarea
               className="input-class font-light focus-visible: ring-orange-1"
-              placeholder="Provide Text to Generate  Audio"
+              placeholder="Describe the image you want to generate"
               rows={5}
               value={imagePrompt}
               onChange={(e) => setImagePrompt(e.target.value)}
@@ -121,18 +121,28 @@ const GenerateThumbnail = ({
           </div>
           <div className="mt-5 w-full max-w-[200px]">
             <Button
-              className="text-16 bg-orange-1 py-4 font-bold text-white-1"
+              className={`text-16 bg-orange-1 py-4 font-bold text-white-1 relative ${isImageLoading ? 'opacity-90' : ''}`}
               onClick={generateImage}
+              disabled={isImageLoading}
             >
               {isImageLoading ? (
-                <>
-                  Generating
-                  <Loader size={20} className="animate-spin mr-2" />
-                </>
+                <div className="flex items-center justify-center gap-2">
+                  <Loader size={20} className="animate-spin" />
+                  <span>Generating...</span>
+                </div>
               ) : (
-                "Generate"
+                "Generate Thumbnail"
               )}
             </Button>
+            {isImageLoading && (
+              <div className="mt-3 p-3 rounded-md bg-black-2 dark:bg-black-2 bg-opacity-25 text-sm flex flex-col gap-2 animate-pulse">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                  <p className="text-gray-400">AI is creating your thumbnail...</p>
+                </div>
+                <p className="text-xs text-gray-500">This may take up to 20 seconds</p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -144,16 +154,25 @@ const GenerateThumbnail = ({
             onChange={(e) => uploadImage(e)}
           />
           {!isImageLoading ? (
-            <Image
-              src="/download 2.svg"
-              width={40}
-              height={40}
-              alt="download"
-            />
+            <div className="flex flex-col items-center">
+              <Image
+                src="/download 2.svg"
+                width={40}
+                height={40}
+                alt="download"
+                className="mb-2"
+              />
+              <span className="text-xs text-gray-400">Click or drop image here</span>
+            </div>
           ) : (
-            <div className="text-60 flex-center font-medium text-white-1">
-              Uploading
-              <Loader size={20} className="animate-spin mr-2" />
+            <div className="flex flex-col items-center gap-2">
+              <Loader size={28} className="animate-spin text-purple-1" />
+              <div className="text-sm flex-center font-medium text-white-1">
+                Uploading image...
+              </div>
+              <div className="w-32 h-1.5 bg-black-6 dark:bg-black-6 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-1 w-1/3 animate-pulse rounded-full"></div>
+              </div>
             </div>
           )}
           <div className="flex flex-col items-center gap-1">
@@ -165,14 +184,19 @@ const GenerateThumbnail = ({
         </div>
       )}
       {image && (
-        <div className="flex-center w-full">
-          <Image
-            src={image}
-            width={200}
-            height={200}
-            className="mt-5"
-            alt="thumbnail"
-          />
+        <div className="flex-center w-full mt-6 animate-in fade-in-50 duration-300">
+          <div className="relative overflow-hidden rounded-lg border-2 border-gray-300 dark:border-black-6 shadow-md">
+            <div className="absolute top-2 right-2 bg-green-600 px-2 py-1 rounded-full z-10 text-white text-xs font-medium">
+              Thumbnail Ready
+            </div>
+            <Image
+              src={image}
+              width={250}
+              height={250}
+              className="mt-0 object-cover aspect-square"
+              alt="thumbnail"
+            />
+          </div>
         </div>
       )}
     </>

@@ -9,15 +9,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Lint: `npm run lint`
 - Stripe commands: `npm run stripe:listen`, `npm run stripe:trigger`
 
+## Testing
+- Test components with Jest and React Testing Library (see testing-strategy.md)
+- Visual testing via device emulation in browser DevTools
+- Manual testing across device sizes (375px to 1920px)
+
 ## Code Style Guidelines
-- Use TypeScript with strict typing
-- Follow Next.js app router pattern
+- TypeScript with strict typing enabled (see tsconfig.json)
+- Next.js app router pattern with page.tsx convention
 - Use path aliases: import from `@/components`, `@/lib`, etc.
-- Components: PascalCase (e.g., `NewsCard.tsx`)
-- Utilities: camelCase (e.g., `formatTime.ts`)
-- Pages follow Next.js conventions with `page.tsx`
+- Components use PascalCase (e.g., `NewsCard.tsx`)
+- Utilities use camelCase (e.g., `formatTime.ts`)
 - Use Tailwind CSS for styling with shadcn UI components
-- Use Convex for backend functionality
-- Use Clerk for authentication
+- Convex for backend functionality (API endpoints in convex/)
+- Clerk for authentication (auth routes in app/(auth)/)
+- Error handling: use try/catch blocks and proper type checking
 
 Always run `npm run lint` before submitting changes to ensure code quality.

@@ -41,7 +41,13 @@ const PulsatingButton = forwardRef<HTMLButtonElement, PulsatingButtonProps>(
         {...props}
       >
         <div className="relative z-10">{children}</div>
-        <div className="absolute top-1/2 left-1/2 size-full rounded-lg bg-inherit animate-pulse -translate-x-1/2 -translate-y-1/2" />
+        <div 
+          className="absolute top-1/2 left-1/2 size-full rounded-lg bg-inherit -translate-x-1/2 -translate-y-1/2" 
+          style={{
+            animation: `pulse ${duration} cubic-bezier(0.4, 0, 0.6, 1) infinite`,
+            background: pulseColor
+          }}
+        />
       </Comp>
     );
   }

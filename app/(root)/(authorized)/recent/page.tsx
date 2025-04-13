@@ -7,22 +7,43 @@ import Searchbar from "@/components/SearchBar";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
-import { newsCardProps } from "@/types";
 import { useQuery } from "convex/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import RecentLoading from "./loading";
 
 const Recent = () => {
   const { audio } = useAudio();
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const recents = useQuery(api.news.getRecents);
   const recentNewsIds = recents
     ?.sort((a, b) => (a.lastPlayed < b.lastPlayed ? 1 : -1))
     .map((r) => r.news);
 
-  const recentNews = useQuery(api.news.getNewsByMultipleIds, {
-    newsIds: recentNewsIds!,
-  });
+  // Only query if we have IDs
+  const recentNews = useQuery(
+    api.news.getNewsByMultipleIds,
+    recentNewsIds && recentNewsIds.length > 0
+      ? { newsIds: recentNewsIds }
+      : "skip"
+  );
 
-  if (!recentNews) return <LoaderSpinner />;
+  useEffect(() => {
+    // Set a timeout to simulate loading for development purposes
+    const timer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // If still in initial loading, don't render anything
+  // This forces Next.js to show the loading.tsx file
+  if (isInitialLoading) {
+    return RecentLoading();
+  }
+
+  // Add safe checks to handle undefined data
+  const hasData = recentNews !== undefined;
 
   return (
     <section
@@ -32,7 +53,11 @@ const Recent = () => {
     >
       <div className="flex flex-col gap-4">
         <h1 className="text-32 font-bold text-white-1">Recent</h1>
-        {recentNews?.length != undefined && recentNews.length > 0 ? (
+        {!hasData ? (
+          <div className="border border-dashed border-gray-400 h-[400px] flex items-center justify-center">
+            <p className="text-white-2">Loading recent items...</p>
+          </div>
+        ) : recentNews?.length != undefined && recentNews.length > 0 ? (
           <div className="podcast_grid">
             {recentNews?.map(
               ({ _id, newsTitle, newsDescription, imageUrl, views }: any) => (
@@ -66,3 +91,7 @@ const Recent = () => {
 };
 
 export default Recent;
+function setIsInitialLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+

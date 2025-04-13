@@ -3,8 +3,10 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import ConvexClerkProvider from "../providers/ConvexClerkProvider";
 import AudioProvider from "@/providers/AudioProvider";
+import { SearchProvider } from "@/providers/SearchProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { GlobalLoadingProvider } from "@/providers/GlobalLoadingProvider";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -32,7 +34,13 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <SearchProvider>
+                <GlobalLoadingProvider>
+                  {/* Make sure children is rendered directly without any wrapping divs
+                      to ensure Next.js can properly detect and apply loading states */}
+                  {children}
+                </GlobalLoadingProvider>
+              </SearchProvider>
             </ThemeProvider>
             <Toaster />
           </body>

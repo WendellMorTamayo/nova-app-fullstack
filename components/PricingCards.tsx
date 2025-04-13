@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckIcon, InfoIcon, FlameIcon } from "lucide-react";
-import { useAction } from "convex/react";
+import { CheckIcon, InfoIcon, FlameIcon, CalendarIcon } from "lucide-react";
+import { useAction, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
+import { useIsSubscribed } from "@/hooks/useIsSubscribed";
 
 
 interface Feature {
@@ -83,10 +84,53 @@ const PricingCard: React.FC<PricingCardProps> = ({
 function PricingCards(){
   const pay = useAction(api.stripe.pay);
   const router = useRouter();
+  const userData = useQuery(api.users.getUser);
+  const isSubscribed = useIsSubscribed();
+  
+  // Format subscription end date if user is subscribed
+  const subscriptionEndDate = userData?.endsOn && isSubscribed
+    ? new Date(userData.endsOn).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : null;
 
   async function handleUpgradeClick() {
-    const url = await pay();
-    router.push(url);
+    // If user is already subscribed, show them their subscription page or settings
+    if (isSubscribed) {
+      router.push("/settings/subscription");
+      return;
+    }
+    
+    // Otherwise proceed with payment flow
+    try {
+      const url = await pay();
+      if (typeof url === 'string') {
+        router.push(url);
+      } else if (url && 'error' in url) {
+        console.error("Payment error:", url.message);
+      }
+    } catch (error) {
+      console.error("Payment initiation error:", error);
+    }
+  }
+  
+  // Add subscription info to premium features if user is subscribed
+  const premiumFeatures = [
+    { name: "All Basic Features" },
+    { name: "AI Podcast Creation" },
+    { name: "High-Quality Audio" },
+    { name: "Priority Support" },
+    { name: "Exclusive Content" },
+    { name: "Ad-Free Experience" },
+  ];
+  
+  if (isSubscribed && subscriptionEndDate) {
+    premiumFeatures.push({ 
+      name: `Subscribed until ${subscriptionEndDate}`,
+      hasInfoIcon: true
+    });
   }
   
   return (
@@ -102,7 +146,8 @@ function PricingCards(){
             { name: "Standard Audio Quality" },
             { name: "Playlists" },
           ]}
-          cta="Sign Up"
+          cta="Current Plan"
+          onClick={() => {}}
         />
       </div>
       <div className="relative w-full max-w-md mx-auto">
@@ -111,18 +156,19 @@ function PricingCards(){
           title="Premium"
           description="Create and customize podcasts with AI"
           price={4} // Premium plan price
-          features={[
-            { name: "All Basic Features" },
-            { name: "AI Podcast Creation" },
-            { name: "High-Quality Audio" },
-            { name: "Priority Support" },
-            { name: "Exclusive Content" },
-            { name: "Ad-Free Experience" },
-          ]}
+          features={premiumFeatures}
           popular={true}
-          cta="Upgrade Now"
+          cta={isSubscribed ? "Manage Subscription" : "Upgrade Now"}
           onClick={handleUpgradeClick}
         />
+        {isSubscribed && (
+          <Badge 
+            className="absolute top-2 right-2 bg-green-600 text-white"
+            variant="default"
+          >
+            CURRENT PLAN
+          </Badge>
+        )}
       </div>
     </div>
   );  

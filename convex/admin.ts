@@ -9,7 +9,7 @@ export const isUserAdmin = async (ctx: any) => {
   // Get the user from the database to check accountType
   const user = await ctx.db
     .query("users")
-    .filter(q => q.eq(q.field("email"), identity.email))
+    .filter((q: { eq: (arg0: any, arg1: any) => any; field: (arg0: string) => any; }) => q.eq(q.field("email"), identity.email))
     .first();
   
   // Check if user's accountType is admin

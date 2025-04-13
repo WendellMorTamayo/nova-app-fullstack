@@ -7,10 +7,11 @@ import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
 import { useQuery } from "convex/react";
-import React from "react";
+import React, { Suspense } from "react";
 import LikesLoading from "./loading";
 
-const Likes = () => {
+// Content component that handles the data loading
+const LikesContent = () => {
   const { audio } = useAudio();
   
   // Get liked items IDs
@@ -75,6 +76,15 @@ const Likes = () => {
         )}
       </div>
     </section>
+  );
+};
+
+// Main page component with Suspense boundary
+const Likes = () => {
+  return (
+    <Suspense fallback={<LikesLoading />}>
+      <LikesContent />
+    </Suspense>
   );
 };
 

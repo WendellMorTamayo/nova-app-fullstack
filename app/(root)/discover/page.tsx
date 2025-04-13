@@ -6,20 +6,19 @@ import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
 import { useQuery } from "convex/react";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, Suspense } from "react";
 import DiscoverLoading from "./loading";
+import { useSearchParams } from "next/navigation";
 
 // Content component with data fetching
-function DiscoverContent({
-  search,
-  categories,
-  sort,
-}: {
-  search: string;
-  categories?: string[];
-  sort?: string;
-}) {
-  const [activeSort, setActiveSort] = useState<string>(sort || "relevance");
+function DiscoverContent() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get('search') || '';
+  const categoriesParam = searchParams.get('categories');
+  const categories = categoriesParam ? categoriesParam.split(',') : undefined;
+  const sortParam = searchParams.get('sort');
+  
+  const [activeSort, setActiveSort] = useState<string>(sortParam || "relevance");
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { audio } = useAudio();
   
@@ -144,15 +143,11 @@ function DiscoverContent({
   );
 }
 
-// Page component that gets search params and lets loading.tsx handle loading state
-export default function Discover({
-  searchParams,
-}: {
-  searchParams: { search: string; categories?: string[]; sort?: string };
-}) {
-  return <DiscoverContent 
-    search={searchParams.search}
-    categories={searchParams.categories}
-    sort={searchParams.sort}
-  />;
+// Page component wrapped in Suspense
+export default function Discover() {
+  return (
+    <Suspense fallback={<DiscoverLoading />}>
+      <DiscoverContent />
+    </Suspense>
+  );
 }

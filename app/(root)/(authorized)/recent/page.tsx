@@ -8,10 +8,11 @@ import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/providers/AudioProvider";
 import { useQuery } from "convex/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import RecentLoading from "./loading";
 
-const Recent = () => {
+// Content component with data loading
+const RecentContent = () => {
   const { audio } = useAudio();
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const recents = useQuery(api.news.getRecents);
@@ -60,10 +61,10 @@ const Recent = () => {
         ) : recentNews?.length != undefined && recentNews.length > 0 ? (
           <div className="podcast_grid">
             {recentNews?.map(
-              ({ _id, newsTitle, newsDescription, imageUrl, views }: any) => (
+              ({ _id, newsTitle, newsDescription, imageUrl, views }) => (
                 <NewsCard
                   key={_id}
-                  imgUrl={imageUrl!}
+                  imgUrl={imageUrl || ""}
                   title={newsTitle}
                   description={newsDescription}
                   newsId={_id}
@@ -90,8 +91,13 @@ const Recent = () => {
   );
 };
 
-export default Recent;
-function setIsInitialLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
+// Main page component with Suspense boundary
+const Recent = () => {
+  return (
+    <Suspense fallback={<RecentLoading />}>
+      <RecentContent />
+    </Suspense>
+  );
+};
 
+export default Recent;

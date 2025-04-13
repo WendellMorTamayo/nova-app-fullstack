@@ -66,6 +66,11 @@ export default function StatsPage() {
       estimatedAnnualRevenue: 0
     }
   };
+
+  if (!userData || !isAdmin) {
+    // Optionally redirect or return early
+    return null;
+  }
   
   // Loading state - show a loading indicator instead of flashing unauthorized message
   if (!initialCheckComplete) {

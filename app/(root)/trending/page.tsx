@@ -63,7 +63,11 @@ function TrendingContent() {
   );
 }
 
-// Page component with explicit loading state
+// Page component with explicit loading state and Suspense boundary
 export default function Trending() {
-  return <TrendingContent />;
+  return (
+    <Suspense fallback={<TrendingLoading />}>
+      <TrendingContent />
+    </Suspense>
+  );
 }

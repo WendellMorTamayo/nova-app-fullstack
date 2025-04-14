@@ -9,8 +9,8 @@ interface DataTablePaginationProps {
   isPaging: 'next' | 'previous' | false;
   onNextPage: () => void;
   onPreviousPage: () => void;
-  isLoading: boolean; // To disable buttons during initial load
-  resultCount: number; // Number of items currently displayed
+  isLoading: boolean;
+  resultCount: number;
 }
 
 export function DataTablePagination({

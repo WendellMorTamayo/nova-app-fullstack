@@ -11,6 +11,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "lovely-flamingo-139.convex.cloud" },
       { protocol: "https", hostname: "posh-greyhound-772.convex.cloud" },
+      { protocol: "https", hostname: "cheery-wildebeest-522.convex.cloud" },
       { protocol: "https", hostname: "img.clerk.com" },
     ],
   },

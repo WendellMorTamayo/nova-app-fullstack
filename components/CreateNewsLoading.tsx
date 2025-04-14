@@ -8,7 +8,7 @@ const CreateNewsLoading = () => {
     <section className="mt-10 flex flex-col animate-in fade-in-5 duration-500">
       <Skeleton className="h-8 w-64 mb-12" />
       
-      <div className="flex flex-col gap-[30px] border-b border-black-5 dark:border-black-5 border-gray-200 pb-10">
+      <div className="flex flex-col gap-[30px] border-b border-black-5 dark:border-black-5 pb-10">
         {/* Title Field */}
         <div className="flex flex-col gap-2.5">
           <Skeleton className="h-6 w-20 mb-1" />

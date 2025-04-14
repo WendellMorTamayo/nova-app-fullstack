@@ -19,6 +19,17 @@ import { Spotlight } from "@/components/magicui/spotlight";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 import TypingAnimation from "@/components/magicui/typing-animation";
 import Link from "next/link";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
 
 // Initial check component
 import { ReactNode } from "react";
@@ -104,6 +115,46 @@ function AdminDashboardContent() {
     }
   };
 
+  // Generate mock data for charts based on actual stats
+  const generateUserGrowthData = () => {
+    const totalUsers = dashboardStats.users.total || 100;
+    return [
+      { month: 'Jan', users: Math.round(totalUsers * 0.3) },
+      { month: 'Feb', users: Math.round(totalUsers * 0.4) },
+      { month: 'Mar', users: Math.round(totalUsers * 0.45) },
+      { month: 'Apr', users: Math.round(totalUsers * 0.5) },
+      { month: 'May', users: Math.round(totalUsers * 0.6) },
+      { month: 'Jun', users: Math.round(totalUsers * 0.7) },
+      { month: 'Jul', users: Math.round(totalUsers * 0.75) },
+      { month: 'Aug', users: Math.round(totalUsers * 0.8) },
+      { month: 'Sep', users: Math.round(totalUsers * 0.9) },
+      { month: 'Oct', users: Math.round(totalUsers * 0.95) },
+      { month: 'Nov', users: Math.round(totalUsers * 0.98) },
+      { month: 'Dec', users: totalUsers }
+    ];
+  };
+
+  const generateRevenueData = () => {
+    const mrr = dashboardStats.financial.mrr || 1000;
+    return [
+      { month: 'Jan', revenue: Math.round(mrr * 0.4) },
+      { month: 'Feb', revenue: Math.round(mrr * 0.5) },
+      { month: 'Mar', revenue: Math.round(mrr * 0.6) },
+      { month: 'Apr', revenue: Math.round(mrr * 0.65) },
+      { month: 'May', revenue: Math.round(mrr * 0.7) },
+      { month: 'Jun', revenue: Math.round(mrr * 0.75) },
+      { month: 'Jul', revenue: Math.round(mrr * 0.8) },
+      { month: 'Aug', revenue: Math.round(mrr * 0.85) },
+      { month: 'Sep', revenue: Math.round(mrr * 0.9) },
+      { month: 'Oct', revenue: Math.round(mrr * 0.95) },
+      { month: 'Nov', revenue: Math.round(mrr * 0.98) },
+      { month: 'Dec', revenue: mrr }
+    ];
+  };
+
+  const userGrowthData = generateUserGrowthData();
+  const revenueData = generateRevenueData();
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="text-center mb-12 relative">
@@ -184,10 +235,50 @@ function AdminDashboardContent() {
                   <CardTitle>User Growth</CardTitle>
                   <CardDescription>New user registrations over time</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6 h-[300px] flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    User growth charts will appear here
-                  </p>
+                <CardContent className="pt-6 h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart
+                      data={userGrowthData}
+                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="userGrowth" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#444" opacity={0.1} />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="#888888"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#888888"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${value}`}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          color: 'white'
+                        }}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="users" 
+                        stroke="#8884d8" 
+                        fillOpacity={1} 
+                        fill="url(#userGrowth)" 
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
               
@@ -300,10 +391,46 @@ function AdminDashboardContent() {
                     Monthly recurring revenue
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="h-[300px] flex items-center justify-center">
-                  <p className="text-muted-foreground">
-                    Revenue charts will be displayed here
-                  </p>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={revenueData}
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#444" opacity={0.1} />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke="#888888"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        stroke="#888888"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `$${value}`}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          color: 'white'
+                        }}
+                        formatter={(value) => [`$${value}`, 'Revenue']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#4f46e5" 
+                        strokeWidth={2}
+                        dot={{ stroke: '#4f46e5', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#4f46e5', strokeWidth: 2 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </TabsContent>

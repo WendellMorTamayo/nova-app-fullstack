@@ -45,6 +45,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
+    "recharts": "^2.15.2",
     "rimraf": "^6.0.1",
     "stripe": "^16.8.0",
     "svix": "^1.28.0",
